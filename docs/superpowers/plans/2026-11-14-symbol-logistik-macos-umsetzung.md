@@ -1,6 +1,6 @@
 # Symbol-Logistik · Umsetzungsplan für macOS
 
-**Ziel** ist eine installierbare Offline-App mit drehbarer 3D-Modellbahn und vollständigem Logistik-Spielkreislauf. Der erste technische Meilenstein ist ein durchgängiger, exportierter Mac-Build mit Straßenbau, Lieferung und Fortsetzen nach Neustart.
+**Ziel** ist eine installierbare Offline-App mit drehbarer 3D-Modellbahn und vollständigem Logistik-Spielkreislauf. Milestone 1 liefert den exportierten Mac-Build mit Startmenü und „Beenden“. Der anschließende technische Ausbau verbindet Straßenbau, Lieferung und Fortsetzen nach Neustart.
 
 **Grundlage** sind die [Architektur-Spezifikation](../specs/2026-11-14-symbol-logistik-architektur.md), der [Spielentwurf](../specs/2026-11-14-symbol-logistik-design.md) und der [UX-Flow](../specs/2026-11-14-symbol-logistik-ux-flow.md). Der [abgelöste Browserplan](2026-11-14-symbol-logistik-implementation.md) dient als Referenz für seine fachlichen Szenarien und vorläufigen Balancingdaten.
 
@@ -8,11 +8,17 @@
 
 ## Projektstruktur und Verträge
 
-- `crates/builder-core` enthält Modell, Simulation, Ansichten und JSON-Spielstände mit Serde. `crates/builder-godot` baut die GDExtension als `cdylib`. `game` enthält das Godot-Projekt einschließlich Szenen, GDScript für HUD und Kamera sowie Exportkonfiguration. Die Extension für den jeweiligen Build unter `res://` bereitstellen und in der exportierten App verifizieren. Generierte Binärdateien und App-Pakete bleiben Build-Artefakte. [GDExtension einbinden](https://godot-rust.github.io/book/intro/hello-world)
+- `crates/builder-core` enthält Modell, Simulation, Ansichten und JSON-Spielstände mit Serde. `crates/builder-godot` baut die GDExtension als `cdylib`. `game` enthält das Godot-Projekt mit Szenen, Assets und Exportkonfiguration. Die Laufzeitlogik für Menü, HUD und Kamera liegt in der Rust-GDExtension. Die Extension für den jeweiligen Build unter `res://` bereitstellen und in der exportierten App verifizieren. Generierte Binärdateien und App-Pakete bleiben Build-Artefakte. [GDExtension einbinden](https://godot-rust.github.io/book/intro/hello-world)
 - Der Core bietet `Game::new(seed: &str) -> Result<Game, GameError>`, `Game::apply(command: CommandEnvelope) -> Result<CommandReceipt, GameError>`, `Game::preview_build(draft: &BuildDraft) -> Result<BuildQuote, GameError>`, `Game::step()`, `Game::view() -> GameView`, `Game::encode_save() -> Result<Vec<u8>, SaveError>` und `Game::decode_save(bytes: &[u8]) -> Result<Game, SaveError>`. Nur die bestätigenden Methoden und `step` ändern die Partie. `GameView` enthält stabile Objekt-IDs, Tick, Revision, Geometrie, Fahrzeugpositionen und die entdeckten Infos für den Inspektor. Die Extension übersetzt diese Aufrufe in Godot-Werte, wobei Spielstände als Bytes und sichtbare Ansichten als Daten übergeben werden.
 - Ein Bauentwurf enthält seine Basisrevision. Vor der Übernahme prüft der Core die gesamte Operation gegen den aktuellen Zustand und bestätigt eine neue Revision nur nach Erfolg. Erfolgreiche Befehls-IDs und ihre Ergebnisse bleiben für Wiederholungen innerhalb desselben Spielstands verfügbar. Die Tickzahl läuft separat. Ganzzahlige Warenmengen in Tausendsteln, gespeicherte Zufallsströme und stabile ID-Reihenfolge machen die Simulation reproduzierbar.
 
-## 1. Technischer Meilenstein auf dem Mac
+## Milestone 1 · Grundgerüst und Startmenü
+
+1. Cargo-Workspace mit engine-unabhängigem Core und Rust-GDExtension einrichten. Rust, Godot-API und Cargo-Abhängigkeiten festlegen. Die Bibliotheken kompilieren und den Core für WebAssembly bauen.
+2. Das Startmenü als Godot-Hauptszene einrichten. „Neue Partie“, „Fortsetzen“ und „Spielstand“ deaktivieren. „Beenden“ verbindet das Button-Signal mit der Rust-Methode. Ein Integrationstest prüft die Menüeinträge und das Beenden per Eingabetaste.
+3. Die macOS-App exportieren, außerhalb des Editors öffnen und im nativen Fenster alle vier Schaltflächen anklicken. Der Prozess endet bei „Beenden“. Die Build-Schritte und die geprüfte Plattform stehen in der [README](../../../README.md).
+
+## 1. Technischer Ausbau auf dem Mac
 
 1. **Rust-Core und Seed-Karte.** Workspace und Core einrichten. Eine kleine verbundene Karte mit einer seedabhängigen Kreuzung, einer Quelle, einem Lager und legalem Platz für eine zusätzliche Straße erzeugen. Die Straßengeometrie als Polylinien in der ebenen Welt halten. Tests belegen gleiche Karte bei gleichem Seed, erreichbare Anschlüsse und stabile IDs nach dem Bau. `cargo test -p builder-core` und `cargo build -p builder-core --target wasm32-unknown-unknown` prüfen.
 2. **Bau und laufende Lieferung.** `CommandEnvelope`, `BuildDraft` und `BuildQuote` einführen. Eine Straße mit Anschlussprüfung, Materialkosten und atomarer Bestätigung umsetzen. Aus Quelle, Lkw und Lager eine echte automatische Lieferung mit Reservierung, Laden, Fahrt und Entladen ausführen. Tests prüfen unveränderten Zustand nach Vorschau und ungültigem oder veraltetem Entwurf, einmalige Kosten bei doppelter Befehls-ID und Warenerhalt nach der Lieferung. Die Fahrposition stammt aus dem Core.

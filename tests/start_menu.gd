@@ -6,10 +6,14 @@ func _initialize() -> void:
 
 
 func check_start_menu() -> void:
+	var scene_deadline := create_timer(3.0)
+	var scene_timeout := fail.bind("Das Startmenü ist nicht rechtzeitig erschienen.")
+	scene_deadline.timeout.connect(scene_timeout)
 	if change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene")) != OK:
 		fail("Das Startmenü lässt sich nicht laden.")
 		return
 	await scene_changed
+	scene_deadline.timeout.disconnect(scene_timeout)
 
 	var buttons := current_scene.find_children("*", "Button")
 	var labels: Array[String] = []

@@ -14,4 +14,5 @@ window/size/window_height_override=720
 window/stretch/mode="canvas_items"
 
 [rendering]
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.055, 0.082, 0.071, 1)

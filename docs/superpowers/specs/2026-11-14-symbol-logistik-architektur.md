@@ -31,6 +31,8 @@ Godot verwaltet automatische und manuelle Sicherungen im lokalen App-Datenverzei
 
 ## Technische Abnahme
 
-Der erste Meilenstein verbindet Core, GDExtension und 3D-Client in einer exportierten Mac-App. Auf dem vorhandenen Apple-Silicon-Mac wird außerhalb des Editors eine generierte Kreuzung aus mehreren Blickwinkeln gewählt, eine Straße über die Bauvorschau ergänzt, eine Lkw-Lieferung gespielt und während einer Fahrt gespeichert. Nach Beenden und Neustarten der App setzt der geladene Lkw dieselbe Lieferung fort.
+Milestone 1 exportiert das Grundgerüst als Mac-App. Sie startet im Hauptmenü mit „Beenden“ als einziger aktiver Schaltfläche. Die gesamte Menülogik liegt in der Rust-GDExtension. Godot stellt die Szene mit Layout, Assets und der Signalverbindung bereit.
+
+Der anschließende technische Ausbau verbindet Core, GDExtension und 3D-Client in der exportierten Mac-App. Auf dem vorhandenen Apple-Silicon-Mac wird außerhalb des Editors eine generierte Kreuzung aus mehreren Blickwinkeln gewählt, eine Straße über die Bauvorschau ergänzt, eine Lkw-Lieferung gespielt und während einer Fahrt gespeichert. Nach Beenden und Neustarten der App setzt der geladene Lkw dieselbe Lieferung fort.
 
 Native Core-Tests prüfen deterministische Wiederholung, atomaren Bau, doppelte Befehle und den Spielstand-Rundlauf. Ein WebAssembly-Build prüft Portabilität. Für die vollständige Mac-Fassung gelten zusätzlich die fachlichen Szenarien und die Leistungsabnahme aus dem Spielentwurf. Plattform- und Geräteabdeckung wird je getestetem Paket ausgewiesen.
