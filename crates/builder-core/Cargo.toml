@@ -5,6 +5,6 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-glam = "0.33"
+glam = "0.34"
 symbios-ground = "0.4"
 symbios-tensor = "0.7"
