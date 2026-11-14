@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript im Strict-Modus, React, Vite, Canvas 2D, native Web Worker und IndexedDB; Zod für Importvalidierung, Vitest für Logiktests, Playwright für Browserabläufe. Bun als Paketmanager und für Projektbefehle, Node für Werkzeuge gemäß deren Unterstützung. Keine Spielengine, kein Backend, kein externer Zustandsspeicher und keine CDN-Laufzeitabhängigkeiten.
 
-**Spec:** [Freigegebenes Design](../specs/2026-11-14-symbol-logistik-design.md). Beide Dokumente vor Umsetzung lesen. Stand: 14. November 2026; im Projekt existieren bisher ausschließlich diese Dokumente, noch kein Git-Repository und kein Produktcode. Lokal vorhanden: Bun 1.4.4 und Node 26.13.0. Paketversionen bei Umsetzung gemeinsam auflösen, exakt in `package.json` und `bun.lock` festhalten; keine ungetesteten Versionsnummern aus diesem Plan ableiten.
+**Spec:** [Freigegebenes Design](../specs/2026-11-14-symbol-logistik-design.md) und [UX-Flow](../specs/2026-11-14-symbol-logistik-ux-flow.md). Beide Spezifikationen vor Umsetzung lesen. Lokal vorhanden: Bun 1.4.4 und Node 26.13.0. Paketversionen bei Umsetzung gemeinsam auflösen, exakt in `package.json` und `bun.lock` festhalten; keine ungetesteten Versionsnummern aus diesem Plan ableiten.
 
 ## Global Constraints
 
@@ -62,6 +62,7 @@ type GameCommand =
   | { type: 'configure-road'; id: EntityId; rules: RoadRules }
   | { type: 'set-policy'; id: EntityId; policy: DeliveryPolicy }
   | { type: 'configure-rail'; id: EntityId; config: RailLineConfig }
+  | { type: 'set-target-release'; targetId: EntityId; enabled: boolean }
   | { type: 'choose-unlock'; offerId: EntityId }
   | { type: 'recover-vehicles'; ids: EntityId[] }
   | { type: 'set-incidents'; enabled: boolean };
@@ -137,7 +138,7 @@ Nach einer grünen Aufgabe `bun run typecheck` und die betroffenen Tests ausfüh
 
 - [ ] **Test erstellen:** Karte laden, zoomen, verschieben, Quelle auswählen und Symbolname im Inspector lesen. Assertions: `await expect(page.getByRole('heading', {name:'Rohstoffvorkommen'})).toBeVisible()`; Pointerabbruch schließt keinen Bauvorgang ab. Tastaturfokus erreicht Toolbar und Inspector.
 - [ ] **Rot prüfen:** `bun run e2e -- tests/e2e/map.spec.ts --project=chromium`.
-- [ ] **Implementieren:** Canvas-Karte mit Welt-/Bildschirmtransformation, DPR-Berücksichtigung, Objekt-Culling und eigener Render-Schleife. Native HTML-Bedienelemente; Karte, Werkzeugleiste links, Inspector rechts, Meilenstein und Zeitsteuerung oben. SVG-Pfade und Canvas-Zeichnung verwenden gemeinsame Symbolgeometrie. Feste Farbzuordnung mit deutlicher Kontur; deutsche Namen und Silhouetten bleiben auch ohne Farbe erkennbar. Keine Emoji, dekorativen Animationsschleifen oder externen Fonts. Escape bricht Werkzeuge ab, Leertaste pausiert außerhalb von Eingabefeldern.
+- [ ] **Implementieren:** Canvas-Karte mit Welt-/Bildschirmtransformation, DPR-Berücksichtigung, Objekt-Culling und eigener Render-Schleife. Native HTML-Bedienelemente; Karte in Modellbahn-Optik, Werkzeugleiste unten, Inspector rechts, Meilenstein und Zeitsteuerung oben. SVG-Pfade und Canvas-Zeichnung verwenden gemeinsame Symbolgeometrie. Feste Farbzuordnung mit deutlicher Kontur; deutsche Namen und Silhouetten bleiben auch ohne Farbe erkennbar. Keine Emoji, dekorativen Animationsschleifen oder externen Fonts. Escape bricht Werkzeuge ab. Leertaste pausiert außerhalb von Eingabefeldern und interaktiven Steuerelementen.
 - [ ] **Grün prüfen:** Browserablauf, Resize und zwei DPI-Stufen visuell prüfen; `bun run build` erfolgreich. Kein Nachweis eines vollständigen Spiels in dieser Aufgabe.
 - [ ] **Commit:** `feat: render and inspect the generated world`.
 
@@ -215,6 +216,8 @@ Nach einer grünen Aufgabe `bun run typecheck` und die betroffenen Tests ausfüh
 
 ### Aufgabe 10: Fünf Meilensteine mit drei gültigen Wahlmöglichkeiten
 
+Zielabgabe nach UX-Spezifikation umsetzen. Neues Ziel mit `releaseEnabled: false` anlegen. Beim Befehl `set-target-release` die Zielkennung prüfen, veraltete Befehle ablehnen und bei ausgeschalteter Freigabe keine Ware entnehmen. Zielkennung, Freigabe, Menge und Rate in `GameView` ausgeben. Prüfung um Freigabe, Widerruf, Reserveschutz und verspäteten Befehl nach Zielwechsel ergänzen.
+
 **Dateien:** Neu `src/model/progression.ts`, `src/economy/progression.ts`, `src/ui/{MilestonePanel,UnlockDialog}.tsx`, `tests/unit/progression.test.ts`, `tests/integration/generation.test.ts`; Rezeptgenerator und Stadtwachstum ergänzen.
 
 **Schnittstellen:** `evaluateProgress(state: GameState): void`, `getUnlockOffers(state: GameState): readonly UnlockOffer[]`, `chooseUnlock(state: GameState, offerId: EntityId): Result<void>`. Die gemeinsame reine Erzeugungsfunktion `deriveProgression(seed: string, choices: readonly number[]): ProgressionPlan` nimmt null bis vier Wahlindizes (0–2), liefert bekannte Rezepte, freigegebene Gebiete, nächste Ziele und Angebote und wird sowohl von Spiel als auch Generatortests verwendet. `ProgressionPlan` und `UnlockOffer` liegen in `src/model/progression.ts`. `UnlockOffer` ist Produkt-, Alternativrezept- oder Gebietskarte mit offen sichtbaren Auswirkungen; einmal erzeugte Angebote werden im Zustand gespeichert.
@@ -251,6 +254,8 @@ Nach einer grünen Aufgabe `bun run typecheck` und die betroffenen Tests ausfüh
 
 ### Aufgabe 13: Lokales Speichern, Laden und robuste Spielstanddateien
 
+Startmenü, Slotwahl, Importbestätigung und Wechsel bei ungesicherten Änderungen gemäß UX-Spezifikation umsetzen. Freigabe der aktuellen Zielabgabe mitspeichern und ältere Spielstände ohne Freigabefeld mit `releaseEnabled: false` laden. Sicherungsfehler beim Wechsel sowie beide Freigabefälle im Ladepfad prüfen.
+
 **Dateien:** Neu `src/storage/{schema,codec,indexed-db,session-lock}.ts`, `src/ui/SavePanel.tsx`, `tests/unit/save.test.ts`, `tests/e2e/save.spec.ts`.
 
 **Schnittstellen:** `encodeSave(state: GameState): string`, `decodeSave(json: string): Result<GameState>`, `writeSave(slot: 'auto' | 'manual', data: string): Promise<Result<void>>`, `readSave(slot: 'auto' | 'manual'): Promise<Result<string>>`. Envelope mit `schemaVersion: 1`, Generatorversion und vollständigem GameState. Import maximal 10 MiB; Schema, Zahlenbereiche, IDs, Referenzen, Mengen und Reservierungsinvarianten vor Austausch prüfen.
@@ -262,6 +267,8 @@ Nach einer grünen Aufgabe `bun run typecheck` und die betroffenen Tests ausfüh
 - [ ] **Commit:** `feat: persist and safely restore complete game states`.
 
 ### Aufgabe 14: Verständliche Diagnose und zusammenhängende Bedienung
+
+Optionale Einstiegshilfe auf der laufenden Karte einbauen. Die Hinweise mit tatsächlichen Quellen, Bauwerkzeugen, Depot und Zielabgabe verknüpfen. Aus- und Wiedereinblenden prüfen. Aus einer offenen Freischaltungswahl Karte und Sanierung zugänglich machen. Bei Rückkehr dieselben Angebote anzeigen und `choice` bis zur gültigen Wahl beibehalten. Wirksame Pausengründe aus `GameView` anzeigen.
 
 **Dateien:** Neu `src/core/diagnostics.ts`, `src/ui/{DiagnosticsPanel,SymbolFilter,HelpPanel}.tsx`, `tests/e2e/usability.spec.ts`; Inspector, Renderer, Rezepte und Lieferdialoge vervollständigen.
 

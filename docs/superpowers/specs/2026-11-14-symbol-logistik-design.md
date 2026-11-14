@@ -115,7 +115,19 @@ Festgefahrene Lastwagen können einzeln oder gebietsweise in ihr Depot zurückge
 
 Ampeldefekte treten erst nach dem ersten Meilenstein und höchstens einzeln auf. Sie sind sichtbar, zeitlich begrenzt und schalten den betroffenen Knoten auf eine sichere, langsamere Vorfahrtsregel um. Keine kollidierenden Freigaben und keine zerstörten Anlagen. Ein erster Defekt wird erklärt; weitere treten mit ausreichend Abstand auf. Während Pause, Freischaltungswahl und Sanierungsmodus läuft kein Störungstimer weiter. Spieler können Störungen für den Spielstand deaktivieren und später wieder einschalten.
 
-## 7. Lesbarkeit und Bedienung
+## 7. Visuelle Richtung, Lesbarkeit und Bedienung
+
+Die [UX-Spezifikation](2026-11-14-symbol-logistik-ux-flow.md) beschreibt die Bildschirmzustände, Bedienabläufe und Fehlerpfade vom Einstieg bis zum freien Betrieb.
+
+### Modellbahn-Miniaturstadt
+
+Die vom Nutzer gewählte [Modellbahn-Variante](../../visual-concepts/miniaturstadt-modellbahn.png) gibt die visuelle Richtung vor. Die Spielkarte wirkt wie eine handgebaute Modellbahnanlage aus schräger Vogelperspektive. Helle Putzfassaden, Terrakottadächer, sattes Grün und ein türkisfarbener Fluss prägen die Stadt. Kurze, weiche Schatten machen die Miniaturen räumlich. Feinere Details sitzen vor allem an Fassaden, Ufern und Gleisen.
+
+Lager sind an ihren Laderampen zu erkennen, Fabriken an ihrer markanten Dachform und Abbaustellen am offenen Gelände. Fahrbahnmarkierungen, Kreuzungen und Frachtsymbole heben sich auch zwischen dicht stehenden Gebäuden klar ab. Die Karte nimmt den größten Teil der Ansicht ein. Lieferziel und Zeitsteuerung stehen oben, die Bauwerkzeuge unten. Details zur ausgewählten Kreuzung erscheinen seitlich.
+
+Das Referenzbild zeigt eine beispielhafte Partie. Kartenausschnitt, Gebäudeanordnung, Rezept und angezeigte Werte hängen vom jeweiligen Spielstand ab.
+
+### Lesbarkeit und Bedienung
 
 Die sechs Symbole sind Kreis, Dreieck, Quadrat, Herz, Stern und Halbmond. Jedes behält über Partien hinweg seine Silhouette und unterstützende Farbe; wirtschaftliche Rolle und Rezepte wechseln. Die Darstellung wird als konsistente Vektorgrafik ausgeführt, nicht als plattformabhängige Emoji. Form bleibt das primäre Unterscheidungsmerkmal. Es gibt keine nur gedrehten oder allein farblich unterschiedenen Ressourcenvarianten.
 
