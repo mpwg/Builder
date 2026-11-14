@@ -7,6 +7,12 @@ Symbol-Logistik ist ein Modellbahn-Logistikspiel für macOS. Milestone 1 startet
 - `game` enthält das Godot-Projekt, die deklarative Menüszene und das macOS-Exportprofil. Die Szene verbindet das Signal des Buttons mit der Rust-Methode.
 - `preview` enthält die eigenständige Browser-Vorschau. Deren Modellbahn-Illustration liegt als WebP im Spielprojekt.
 
+## VS Code
+
+Den Repository-Ordner in VS Code öffnen und im Menü **Terminal → Task ausführen** einen Task wählen. **Spiel bauen** ist der Standard-Buildtask (⇧⌘B). **Spiel starten** baut und öffnet das Spiel. **Projekt prüfen** führt die Rust-Prüfungen und den Godot-Integrationstest aus. **macOS-App exportieren** schreibt den Universal-Build nach `dist/Symbol-Logistik.app`.
+
+Die Tasks benötigen Fish und dieselben Werkzeuge und Exportvorlagen wie die folgenden Terminalbefehle. Godot wird über den `PATH`, in den Programme-Ordnern oder im lokalen Builder-Cache gesucht. Für einen anderen Installationsort kann `BUILDER_GODOT` beim Start von VS Code auf die ausführbare Godot-Datei gesetzt werden.
+
 ## Lokal starten
 
 Vorausgesetzt sind Apple Silicon, die Xcode Command Line Tools, Rustup und [Godot 4.7.2 stable](https://godotengine.org/download/archive/4.7.2-stable/). Rustup wählt anhand von `rust-toolchain.toml` Rust 1.100.0 mit Rust Edition 2024. Die Godot-Anbindung verwendet `godot` 0.5.5 mit der Godot-4.7-API.
