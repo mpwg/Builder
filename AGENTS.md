@@ -14,6 +14,8 @@ Builder ist das Repo für Symbol-Logistik, ein lokal spielbares macOS-Spiel mit 
 
 ## Skills
 
+- Nutze [`rust-best-practices`](.agents/skills/rust-best-practices/SKILL.md), wenn du Rust-Code in `builder-core` oder `builder-godot` schreibst, änderst oder prüfst. Lies die Abschnitte zur konkreten Aufgabe, etwa zu Ownership, Fehlerbehandlung, Tests oder Performance. Maßgeblich bleiben die Toolchain und die Prüfungen des Repos.
+- Nutze [`godot-3d-essentials`](.agents/skills/godot-3d-essentials/SKILL.md), wenn du die 3D-Szene in `game/` oder ihren Aufbau in `builder-godot` änderst oder Darstellungsfehler untersuchst. Dazu gehören Kameraprojektion, Beleuchtung, Umgebung, Materialien und lokale oder globale Transformationen. Übertrage die Godot-Konzepte aus den GDScript-Beispielen auf die vorhandene Rust-GDExtension.
 - Lies vor dem Schreiben oder Ändern von Shellskripten `~/.agents/skills/personal-shell-scripts/SKILL.md`.
 - Nutze für HTML-, CSS- und clientseitige JavaScript-Arbeit in `preview/` zuerst Modern Web Guidance. Führe dessen CLI mit `bunx --bun modern-web-guidance@latest` aus. Installiere oder aktualisiere dessen Skills direkt über `bunx --bun skills`.
 
