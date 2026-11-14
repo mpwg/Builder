@@ -145,23 +145,23 @@ pub(super) fn build(world: &mut Gd<Node3D>, map: &MapView) {
                 }
             }
             BuildingKind::CircleSource | BuildingKind::TriangleSource => {
-                let marker = match building.kind {
-                    BuildingKind::CircleSource => (28, &blue),
-                    _ => (3, &yellow),
-                };
                 add_box(
                     &mut model,
                     Vector3::UP * 0.25,
                     Vector3::new(building.width, 0.5, building.depth),
                     &gravel,
                 );
-                add_disc(
-                    &mut model,
-                    Vector3::UP * 0.7,
-                    building.width.min(building.depth) * 0.3,
-                    marker.0,
-                    marker.1,
-                );
+                let radius = building.width.min(building.depth) * 0.3;
+                let center = Vector3::UP * 0.7;
+                if building.kind == BuildingKind::CircleSource {
+                    add_disc(&mut model, center, radius, 28, &blue);
+                } else {
+                    let mut prism = PrismMesh::new_gd();
+                    prism.set_size(Vector3::new(2.0 * radius, 2.0 * radius, 0.4));
+                    let mut marker = add_mesh(&mut model, center, prism.upcast(), &yellow);
+                    marker.set_name("TriangleMarker");
+                    marker.set_rotation(Vector3::new(std::f32::consts::FRAC_PI_2, 0.0, 0.0));
+                }
             }
         }
     }

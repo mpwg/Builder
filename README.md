@@ -1,10 +1,10 @@
 # Symbol-Logistik
 
-Symbol-Logistik ist ein Modellbahn-Logistikspiel für macOS. Milestone 1 startet im Hauptmenü. „Beenden“ ist die einzige aktive Schaltfläche. „Neue Partie“, „Fortsetzen“ und „Spielstand“ sind sichtbar und deaktiviert.
+Symbol-Logistik ist ein Modellbahn-Logistikspiel für macOS. In Milestone 2 öffnet **Neue Partie → Starten** eine generierte Miniaturstadt mit neun Kreuzungen, Wohnhäusern, Zentrallager und zwei Rohstoffvorkommen. Bei jedem Start wird der Seed automatisch gewählt. Auf der Karte verschiebt **WASD** die Ansicht, **Escape** führt ins Hauptmenü zurück. Auf der Zwischenseite führen **Abbrechen** und **Escape** zurück zu „Neue Partie“.
 
-- `crates/builder-core` ist das engine-unabhängige Grundgerüst für die spätere Simulation.
-- `crates/builder-godot` ist die Rust-GDExtension. Sie stellt die Menüklasse bereit und führt das Beenden aus.
-- `game` enthält das Godot-Projekt, die deklarative Menüszene und das macOS-Exportprofil. Die Szene verbindet das Signal des Buttons mit der Rust-Methode.
+- `crates/builder-core` erzeugt und besitzt die engine-unabhängigen Kartendaten. Ein Seed reproduziert dieselbe Karte mit Raster- oder Ringstraßennetz.
+- `crates/builder-godot` ist die Rust-GDExtension. Sie verwaltet den Menüablauf, baut die Godot-Ansicht aus den Core-Daten und steuert die Kamera.
+- `game` enthält das Godot-Projekt, die deklarativen Szenen und das macOS-Exportprofil.
 - `preview` enthält die eigenständige Browser-Vorschau. Deren Modellbahn-Illustration liegt als WebP im Spielprojekt.
 
 ## VS Code
@@ -45,16 +45,17 @@ $godot --headless --path game --export-release macOS "$PWD/dist/Symbol-Logistik.
 open dist/Symbol-Logistik.app
 ```
 
-Der lokale Universal-Export ist ad hoc signiert. Die Laufzeitprüfung erfolgte auf einem MacBook Pro mit Apple M4 Pro unter macOS 27.2.1. Im exportierten Fenster wurden alle vier Schaltflächen angeklickt. Nur „Beenden“ löste eine Aktion aus und schloss den Prozess. Der Build enthält die Rust-Library und die Menü-Assets.
+Der lokale Universal-Export ist ad hoc signiert. Auf einem MacBook Pro mit Apple M4 Pro und macOS 27.2.1 wurden in der exportierten App eine organische Ringkarte und eine Rasterkarte gestartet. Die Abnahme im App-Fenster umfasste die Zwischenseite, Kamerabewegung, Escape zum Hauptmenü und den Start der zweiten Partie.
 
 ## Prüfen
 
-Nach dem lokalen Build und Asset-Import deckt der Godot-Integrationstest die Startszene, die drei deaktivierten Buttons und das Beenden per Eingabetaste bei fokussierter Schaltfläche ab.
+Die Rust-Core-Tests prüfen mit drei festen Seed-Reihen zu je 256 Karten die Reproduzierbarkeit und Variation, beide Netzformen, eindeutige IDs, Erreichbarkeit, Straßenverläufe, Gebäudeabstände und freie Zufahrten. Nach Build und Asset-Import prüft der Godot-Integrationstest Menü und Zwischenseite per Tastatur, einen Kartenfehler mit anschließendem Neustart der Erzeugung, den Szenenaufbau, alle WASD-Richtungen, gleichmäßiges diagonales Tempo, die Kartenbegrenzung und Stillstand beim Loslassen, Escape und Beenden.
 
 ```fish
 set -l godot /Applications/Godot.app/Contents/MacOS/Godot
 cargo fmt --check
 cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo test --locked --workspace
 cargo build --locked -p builder-core --target wasm32-unknown-unknown
 $godot --headless --path game --script "$PWD/tests/start_menu.gd"
 ```

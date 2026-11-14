@@ -84,7 +84,11 @@ func check_start_menu() -> void:
 	if buildings.size() < 24 or world.get_child_count() <= buildings.size() + 10:
 		fail("Die erzeugte Welt muss Straßen und Miniaturen enthalten.")
 		return
-	if not await check_camera(current_scene.get_node("Camera3D")):
+	var marker := world.find_child("TriangleMarker", true, false) as MeshInstance3D
+	if marker == null or not marker.mesh is PrismMesh:
+		fail("Die Dreieckquelle braucht ein dreieckiges Modell.")
+		return
+	if not await check_camera(current_scene.get_node("Camera3D"), world):
 		return
 	tap(KEY_ESCAPE)
 	await process_frame
@@ -99,7 +103,7 @@ func check_start_menu() -> void:
 	fail("Beenden hat den Prozess nicht beendet.")
 
 
-func check_camera(camera: Camera3D) -> bool:
+func check_camera(camera: Camera3D, world: Node3D) -> bool:
 	var right := camera.basis.x.slide(Vector3.UP).normalized()
 	var up := camera.basis.y.slide(Vector3.UP).normalized()
 	for direction in [[KEY_W, up], [KEY_A, -right], [KEY_S, -up], [KEY_D, right]]:
@@ -115,7 +119,39 @@ func check_camera(camera: Camera3D) -> bool:
 		if not camera.position.is_equal_approx(stopped):
 			fail("Die Kamera bewegt sich nach dem Loslassen weiter.")
 			return false
+	var initial := camera.position
+	physical_key(KEY_D, true)
+	await create_timer(0.35).timeout
+	physical_key(KEY_D, false)
+	var cardinal_speed := camera.position.distance_to(initial)
+	camera.position = initial
+	physical_key(KEY_D, true)
+	physical_key(KEY_W, true)
+	await create_timer(0.35).timeout
+	physical_key(KEY_D, false)
+	physical_key(KEY_W, false)
+	var diagonal_speed := camera.position.distance_to(initial)
+	if absf(diagonal_speed - cardinal_speed) > cardinal_speed * 0.17:
+		fail("Diagonale und gerade Kamerabewegung müssen gleich schnell sein.")
+		return false
+
+	# Die Kameramitte ist der Schnittpunkt ihrer Blickachse mit der Bauebene.
+	var ground := world.get_child(0) as MeshInstance3D
+	var ground_mesh := ground.mesh as BoxMesh
+	var boundary := ground.position.x + ground_mesh.size.x * 0.5
+	var target := ground_point(camera)
+	camera.position.x += boundary - target.x - 1.0
+	physical_key(KEY_D, true)
+	await create_timer(0.1).timeout
+	physical_key(KEY_D, false)
+	if not is_equal_approx(ground_point(camera).x, boundary):
+		fail("Die Kameramitte muss an der Kartengrenze stoppen.")
+		return false
 	return true
+
+
+func ground_point(camera: Camera3D) -> Vector3:
+	return camera.position - camera.basis.z * camera.position.y / camera.basis.z.y
 
 
 func physical_key(key: Key, pressed: bool) -> void:
