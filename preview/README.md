@@ -1,5 +1,7 @@
 # UX-Vorschau · Symbol-Logistik
 
+Die Vorschau ist ein eigenständiger UX-Prototyp. Die installierbare Spielfassung folgt der [Architektur-Spezifikation](../docs/superpowers/specs/2026-11-14-symbol-logistik-architektur.md).
+
 Im Verzeichnis `preview` einen lokalen Dateiserver starten:
 
 ```sh

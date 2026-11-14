@@ -1,5 +1,7 @@
 # Symbol-Logistik Implementation Plan
 
+> **Abgelöst.** Die [Architektur-Spezifikation](../specs/2026-11-14-symbol-logistik-architektur.md) legt die installierbare Mac-App mit Rust-Core und Godot 4 fest. Dieser Browserplan bleibt als historische Referenz für fachliche Szenarien, Testfälle und Balancingdaten erhalten.
+
 > **For agentic workers:** Use delegate-coding-efficiently for optional coding delegation, delegate-work-efficiently for non-coding packages, or executing-plans for explicit inline implementation. Delegation must justify its overhead. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Eine vollständig lokal im Browser spielbare erste Fassung bauen, in der zufällige Symbolrezepte, detaillierter Straßenverkehr, einfache Bahnlogistik und wählbare Meilensteine einen jederzeit sanierbaren Kreislauf bilden.

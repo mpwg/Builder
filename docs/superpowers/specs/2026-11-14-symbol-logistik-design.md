@@ -1,10 +1,10 @@
 # Symbol-Logistik: erste vollständige Spielfassung
 
-Status: Vom Nutzer am 14. November 2026 einschließlich der vorgeschlagenen Grenzen freigegeben. Noch keine Implementierung.
+Status: Spielregeln und Umfang am 14. November 2026 freigegeben. Die [Architektur-Spezifikation](2026-11-14-symbol-logistik-architektur.md) legt die darauf aufbauende Mac-Fassung fest.
 
 ## 1. Spielidee und bestätigte Leitlinien
 
-Ein Browser-Spiel über ein leistungsfähiges, sanierbares Logistiknetz in einer automatisch wachsenden Stadt. Der Spieler verbessert ein prozedural entstandenes Straßennetz, ergänzt frei gezeichnete Straßen und platziert Abbaubetriebe, Fabriken, Lager und Verteilpunkte. Lokale Lieferfahrzeuge sammeln und verteilen Waren. Verteilpunkte bündeln Ferntransporte zum Zentrallager. Alles liegt auf einer zusammenhängenden Karte.
+Ein Desktop-Spiel über ein leistungsfähiges, sanierbares Logistiknetz in einer automatisch wachsenden Stadt. Der Spieler verbessert ein prozedural entstandenes Straßennetz, ergänzt frei gezeichnete Straßen und platziert Abbaubetriebe, Fabriken, Lager und Verteilpunkte. Lokale Lieferfahrzeuge sammeln und verteilen Waren. Verteilpunkte bündeln Ferntransporte zum Zentrallager. Alles liegt auf einer zusammenhängenden Karte.
 
 Der Spielreiz liegt im Beobachten, Verstehen und Verbessern der Warenströme. Am Anfang funktionieren Standardregelungen. Mit steigenden Lieferanforderungen werden Fahrspuren, Ampelphasen und koordinierte Kreuzungen wichtig. Technische Störungen prüfen die Reserven. Es gibt weder Game-over noch eine wirtschaftliche Sackgasse: Auch ein vollständig festgefahrenes Netz muss wiederherstellbar bleiben.
 
@@ -30,7 +30,7 @@ Die Kartengrundlage ist das bereits gemeinsam gewählte zusammenhängende Netz m
 
 Die folgenden konkreten Grenzen wurden zunächst als Vorschläge des Entwurfs formuliert und mit der Gesamtfreigabe am 14. November 2026 bestätigt:
 
-- Singleplayer im Desktop-Browser mit Maus und Tastatur. Keine Anmeldung, kein Backend und keine laufende Netzwerkabhängigkeit nach dem Laden. Mobile Bedienung und Multiplayer gehören nicht zur ersten Fassung.
+- Singleplayer als installierbare macOS-App mit Maus und Tastatur. Die Partie läuft offline und ohne Anmeldung oder Backend. Mobile Bedienung und Multiplayer gehören nicht zur ersten Fassung.
 - Eine anfängliche Zone, eine zusätzlich erschließbare Zone und ein Zentrallager. Ein Seed bestimmt Karte, Ressourcenvorkommen und den reproduzierbaren Vorrat an Freischaltungen. Ein neuer Seed erzeugt eine neue Partie; Laden würfelt nichts neu.
 - Sechs Symboltypen insgesamt: zwei anfänglich erreichbare Grundressourcen, eine mögliche Grundressource der zweiten Zone und drei mögliche kombinierte Produkte. Welche Symbole diese Rollen haben, wechselt pro Partie.
 - Fünf Liefermeilensteine. Nach den ersten vier wird jeweils eine von drei angebotenen Freischaltungen gewählt. Nach dem fünften erscheint ein unaufdringlicher Abschluss; die bestehende Welt kann anschließend frei weiterbetrieben und saniert werden, ohne neue Fortschrittsstufen.
@@ -121,7 +121,7 @@ Die [UX-Spezifikation](2026-11-14-symbol-logistik-ux-flow.md) beschreibt die Bil
 
 ### Modellbahn-Miniaturstadt
 
-Die vom Nutzer gewählte [Modellbahn-Variante](../../visual-concepts/miniaturstadt-modellbahn.png) gibt die visuelle Richtung vor. Die Spielkarte wirkt wie eine handgebaute Modellbahnanlage aus schräger Vogelperspektive. Helle Putzfassaden, Terrakottadächer, sattes Grün und ein türkisfarbener Fluss prägen die Stadt. Kurze, weiche Schatten machen die Miniaturen räumlich. Feinere Details sitzen vor allem an Fassaden, Ufern und Gleisen.
+Die vom Nutzer gewählte [Modellbahn-Variante](../../visual-concepts/miniaturstadt-modellbahn.png) gibt die visuelle Richtung vor. Die Spielkarte wirkt wie eine handgebaute Modellbahnanlage aus schräger Vogelperspektive mit drehbarer 3D-Kamera. Helle Putzfassaden, Terrakottadächer, sattes Grün und ein türkisfarbener Fluss prägen die Stadt. Kurze, weiche Schatten machen die Miniaturen räumlich. Feinere Details sitzen vor allem an Fassaden, Ufern und Gleisen.
 
 Lager sind an ihren Laderampen zu erkennen, Fabriken an ihrer markanten Dachform und Abbaustellen am offenen Gelände. Fahrbahnmarkierungen, Kreuzungen und Frachtsymbole heben sich auch zwischen dicht stehenden Gebäuden klar ab. Die Karte nimmt den größten Teil der Ansicht ein. Lieferziel und Zeitsteuerung stehen oben, die Bauwerkzeuge unten. Details zur ausgewählten Kreuzung erscheinen seitlich.
 
@@ -135,7 +135,7 @@ Gebäude zeigen Zutaten, Ergebnis und Betriebszustand. Die Rezeptübersicht stel
 
 Jede wartende Fabrik oder Lieferung erklärt ihren wesentlichen Hinderungsgrund: fehlende Zutat, reservierter Bestand, volles Ziel, fehlendes Fahrzeug, keine Verbindung, feste Lieferantenvorgabe oder blockierte Strecke. Ein Klick führt zum betroffenen Ort. Bei ausgezoomter Karte werden Informationen zusammengefasst; die Simulation und ihre Mengen bleiben unverändert.
 
-Pause und einfache Zeitbeschleunigung sind jederzeit verfügbar. Freischaltungswahl und Bauplanung pausieren standardmäßig. Ein lokaler Spielstand wird automatisch und manuell gespeichert. Export und Import eines Spielstands ermöglichen Sicherung und Weitergabe; Seed, entdeckte Rezepte, Angebote, Bestände, Fahrzeuge, Aufträge und Fortschritt müssen erhalten bleiben. Browserdaten können verloren gehen; die Oberfläche macht die lokale Speicherung und Exportmöglichkeit verständlich.
+Pause und einfache Zeitbeschleunigung sind jederzeit verfügbar. Freischaltungswahl und Bauplanung pausieren standardmäßig. Ein lokaler Spielstand wird automatisch und manuell gespeichert. Export und Import eines Spielstands ermöglichen Sicherung und Weitergabe; Seed, entdeckte Rezepte, Angebote, Bestände, Fahrzeuge, Aufträge und Fortschritt müssen erhalten bleiben. Automatische und manuelle Sicherungen liegen im lokalen App-Datenverzeichnis. Die Oberfläche zeigt den Speicherstatus und bietet den Export als Datei an.
 
 ## 8. Abnahme der ersten Fassung
 
@@ -148,10 +148,10 @@ Abschluss bedeutet ein tatsächlich spielbarer Kreislauf, nicht nur vorhandene M
 5. **Sanierung:** Einen vollständigen Gridlock mit leeren Baustofflagern herstellen. Mit Pause, Fahrzeugbergung, Rückbau und Sanierungshilfe wieder eine funktionierende Lieferkette erreichen. Kein Warenverlust, keine dauerhaften Reservierungen und kein Neustart erforderlich.
 6. **Störung:** Einen Ampelausfall beobachten, dessen Auswirkung erklären und das Netz während oder nach dem Ausfall stabilisieren. Ausschalten von Störungen und Pausieren verändern keine Warenbestände.
 7. **Speichern:** Während einer Fahrt, einer Freischaltungswahl und eines Ampeldefekts speichern und laden. Bestände, offene Aufträge, Entscheidungen und Zeitverlauf bleiben konsistent. Export und Import praktisch prüfen.
-8. **Darstellung und Leistung:** Symbole bei üblichen Zoomstufen auch in Graustufen unterscheiden, lesbare Texte und Bedienbarkeit prüfen. Einen repräsentativen Spielstand mit ungefähr 100 Lastwagen und zwei Zügen im tatsächlich verfügbaren Desktop-Browser messen. Ziel: flüssige Bedienung, keine zunehmenden Simulationsrückstände und in der Regel mindestens 30 Bilder pro Sekunde auf dem dokumentierten Testgerät. Browser- oder Geräteabdeckung nur nach tatsächlicher Prüfung behaupten.
+8. **Darstellung und Leistung:** Symbole bei üblichen Zoomstufen auch in Graustufen unterscheiden, lesbare Texte und Bedienbarkeit prüfen. Einen repräsentativen Spielstand mit ungefähr 100 Lastwagen und zwei Zügen in der exportierten Mac-App bei drehbarer Kamera messen. Ziel: flüssige Bedienung, keine zunehmenden Simulationsrückstände und in der Regel mindestens 30 Bilder pro Sekunde auf dem dokumentierten Testgerät. Plattform und tatsächlich getestetes Gerät im Abnahmebericht nennen.
 
 ## 9. Was der Umsetzung überlassen bleibt
 
-Framework, Renderingtechnik, Pfadfindungsverfahren, Simulationsschritt, Datenstrukturen und interne Schnittstellen werden im nachfolgenden Implementierungsplan festgelegt. Dieser Entwurf legt das Verhalten fest, nicht eine ungeprüfte Bibliothekswahl. Balancingwerte für Baukosten, Kapazitäten, Geschwindigkeiten und Meilensteinmengen werden als leicht veränderbare Daten angelegt und anhand der oben beschriebenen Spieltests abgestimmt.
+Core, Renderingtechnik, Simulationsschritt und Plattformreihenfolge folgen der [Architektur-Spezifikation](2026-11-14-symbol-logistik-architektur.md). Details zu Pfadfindung, Datenstrukturen und Integration folgen im daraus abgeleiteten Umsetzungsplan. Balancingwerte für Baukosten, Kapazitäten, Geschwindigkeiten und Meilensteinmengen werden als leicht veränderbare Daten angelegt und anhand der oben beschriebenen Spieltests abgestimmt.
 
-Die Freigabe dieses Dokuments autorisiert noch keine Veröffentlichung. Vor Produktcode folgt nach Freigabe ein Implementierungsplan. Aktuell ist das Arbeitsverzeichnis leer und kein Git-Repository; deshalb wird dieser Entwurf als lokale Datei abgelegt und noch nicht committed.
+Die Veröffentlichung erfordert eine gesonderte Freigabe.
