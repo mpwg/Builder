@@ -8,4 +8,4 @@ rust-version.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = { version = "=0.5.5", default-features = false, features = ["api-4-7"] }
+godot = { version = "=0.5.5", features = ["api-4-7"] }
