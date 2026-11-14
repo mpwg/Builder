@@ -1,5 +1,5 @@
 use builder_core::{BuildingKind, Game, Point};
-use godot::classes::{Camera3D, INode3D, InputEvent, Node3D};
+use godot::classes::{Camera3D, INode3D, Input, InputEvent, Node3D};
 use godot::global::Error;
 use godot::prelude::*;
 
@@ -7,6 +7,7 @@ use crate::{START_MENU_SCENE, pressed_escape};
 
 mod scenery;
 
+const CAMERA_SPEED: f32 = 220.0;
 const CAMERA_OFFSET: Vector3 = Vector3::new(165.0, 460.0, 260.0);
 
 #[derive(GodotClass)]
@@ -37,6 +38,31 @@ impl INode3D for MapScene {
         let center = ground_position(warehouse.position);
         let mut camera = self.base().get_node_as::<Camera3D>("Camera3D");
         camera.look_at_from_position(center + CAMERA_OFFSET, center);
+    }
+
+    fn process(&mut self, delta: f64) {
+        let Some(game) = &self.game else {
+            return;
+        };
+        let direction = Input::singleton().get_vector(
+            "camera_left",
+            "camera_right",
+            "camera_up",
+            "camera_down",
+        );
+        if direction.is_zero_approx() {
+            return;
+        }
+
+        let mut camera = self.base().get_node_as::<Camera3D>("Camera3D");
+        let basis = camera.get_basis();
+        let right = basis.col_a().slide(Vector3::UP).normalized();
+        let up = basis.col_b().slide(Vector3::UP).normalized();
+        let shift = (right * direction.x - up * direction.y) * CAMERA_SPEED * delta as f32;
+        let bounds = game.view().bounds;
+        let center = (camera.get_position() - CAMERA_OFFSET + shift)
+            .clamp(ground_position(bounds.min), ground_position(bounds.max));
+        camera.set_position(center + CAMERA_OFFSET);
     }
 
     fn unhandled_key_input(&mut self, event: Gd<InputEvent>) {

@@ -84,6 +84,8 @@ func check_start_menu() -> void:
 	if buildings.size() < 24 or world.get_child_count() <= buildings.size() + 10:
 		fail("Die erzeugte Welt muss Straßen und Miniaturen enthalten.")
 		return
+	if not await check_camera(current_scene.get_node("Camera3D")):
+		return
 	tap(KEY_ESCAPE)
 	await process_frame
 	await process_frame
@@ -95,6 +97,32 @@ func check_start_menu() -> void:
 	tap(KEY_ENTER)
 	await create_timer(0.3).timeout
 	fail("Beenden hat den Prozess nicht beendet.")
+
+
+func check_camera(camera: Camera3D) -> bool:
+	var right := camera.basis.x.slide(Vector3.UP).normalized()
+	var up := camera.basis.y.slide(Vector3.UP).normalized()
+	for direction in [[KEY_W, up], [KEY_A, -right], [KEY_S, -up], [KEY_D, right]]:
+		var initial := camera.position
+		physical_key(direction[0], true)
+		await create_timer(0.1).timeout
+		physical_key(direction[0], false)
+		if (camera.position - initial).dot(direction[1]) < 2.0:
+			fail("Eine WASD-Taste verschiebt die Karte nicht in die erwartete Richtung.")
+			return false
+		var stopped := camera.position
+		await create_timer(0.05).timeout
+		if not camera.position.is_equal_approx(stopped):
+			fail("Die Kamera bewegt sich nach dem Loslassen weiter.")
+			return false
+	return true
+
+
+func physical_key(key: Key, pressed: bool) -> void:
+	var event := InputEventKey.new()
+	event.physical_keycode = key
+	event.pressed = pressed
+	Input.parse_input_event(event)
 
 
 func tap(key: Key) -> void:
