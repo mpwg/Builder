@@ -65,6 +65,9 @@ pub(super) fn trace(layout: MapLayout, seed: u64) -> Option<Streets> {
         return None;
     }
     extract_blocks(&mut graph);
+    if !faces_are_disjoint(&graph) {
+        return None;
+    }
 
     let ring = match layout {
         MapLayout::Grid => BTreeSet::new(),
@@ -164,6 +167,67 @@ fn perimeter_edges(perimeter: &[NodeId]) -> impl Iterator<Item = (NodeId, NodeId
         .zip(perimeter.iter().copied().cycle().skip(1))
 }
 
+fn strictly_contains(graph: &RoadGraph, perimeter: &[NodeId], point: Vec2) -> bool {
+    let mut inside = false;
+    for (a, b) in perimeter_edges(perimeter) {
+        let (a, b) = (graph.node_pos(a), graph.node_pos(b));
+        let delta = b - a;
+        let from_a = point - a;
+        if delta.perp_dot(from_a).abs() <= EPSILON * delta.length()
+            && from_a.dot(delta) >= 0.0
+            && (point - b).dot(delta) <= 0.0
+        {
+            return false;
+        }
+        if (a.y > point.y) != (b.y > point.y) && point.x < a.x + delta.x * (point.y - a.y) / delta.y
+        {
+            inside = !inside;
+        }
+    }
+    inside
+}
+
+fn faces_are_disjoint(graph: &RoadGraph) -> bool {
+    // In einem planaren Graphen haben echte Flächen getrennte Innenräume.
+    // Der Extraktor kann bei Schleifen mit gemeinsamem Knoten einen Umlauf
+    // vorzeitig schließen und dadurch verschachtelte Flächen liefern.
+    let bounds: Vec<_> = graph
+        .blocks
+        .iter()
+        .map(|block| {
+            block.perimeter.iter().map(|&id| graph.node_pos(id)).fold(
+                (Vec2::splat(f32::INFINITY), Vec2::splat(f32::NEG_INFINITY)),
+                |(min, max), point| (min.min(point), max.max(point)),
+            )
+        })
+        .collect();
+    graph.blocks.iter().enumerate().all(|(index, block)| {
+        let (min, max) = bounds[index];
+        graph
+            .blocks
+            .iter()
+            .enumerate()
+            .skip(index + 1)
+            .all(|(next, other)| {
+                let (other_min, other_max) = bounds[next];
+                if max.cmple(other_min).any() || other_max.cmple(min).any() {
+                    return true;
+                }
+                [
+                    (&block.perimeter, &other.perimeter),
+                    (&other.perimeter, &block.perimeter),
+                ]
+                .into_iter()
+                .all(|(boundary, candidate)| {
+                    perimeter_edges(candidate).all(|(a, b)| {
+                        let midpoint = (graph.node_pos(a) + graph.node_pos(b)) * 0.5;
+                        !strictly_contains(graph, boundary, midpoint)
+                    })
+                })
+            })
+    })
+}
+
 fn ring_boundary(
     graph: &RoadGraph,
     adjacency: &[Vec<NodeId>],
@@ -171,17 +235,7 @@ fn ring_boundary(
     let perimeter = &graph
         .blocks
         .iter()
-        .find(|block| {
-            perimeter_edges(&block.perimeter)
-                .filter(|&(a, b)| {
-                    let (a, b) = (graph.node_pos(a), graph.node_pos(b));
-                    (a.y > CENTER.y) != (b.y > CENTER.y)
-                        && CENTER.x < a.x + (b.x - a.x) * (CENTER.y - a.y) / (b.y - a.y)
-                })
-                .count()
-                % 2
-                == 1
-        })?
+        .find(|block| strictly_contains(graph, &block.perimeter, CENTER))?
         .perimeter;
     let nodes: BTreeSet<_> = perimeter.iter().copied().collect();
     if nodes.len() != perimeter.len() {
@@ -315,6 +369,36 @@ fn export(
 mod tests {
     use super::*;
     use symbios_tensor::{CityBlock as TensorBlock, RoadType};
+
+    #[test]
+    fn faces_with_nested_street_loops_are_rejected() {
+        let mut graph = RoadGraph::default();
+        for (x, z) in [
+            (0., 0.),
+            (100., 0.),
+            (100., 100.),
+            (0., 100.),
+            (30., 20.),
+            (50., 50.),
+            (20., 30.),
+        ] {
+            graph.add_node([x, z].into());
+        }
+        for (a, b) in [
+            (0, 3),
+            (1, 2),
+            (2, 3),
+            (0, 1),
+            (0, 4),
+            (4, 5),
+            (5, 6),
+            (6, 0),
+        ] {
+            graph.add_edge(a, b, RoadType::Major);
+        }
+        extract_blocks(&mut graph);
+        assert!(!faces_are_disjoint(&graph));
+    }
 
     #[test]
     fn inward_dead_ends_do_not_count_as_spokes() {
