@@ -7,6 +7,8 @@ Symbol-Logistik ist ein Modellbahn-Logistikspiel für macOS. In Milestone 2 öff
 - `game` enthält das Godot-Projekt, die deklarativen Szenen und das macOS-Exportprofil.
 - `preview` enthält die eigenständige Browser-Vorschau. Deren Modellbahn-Illustration liegt als WebP im Spielprojekt.
 
+Die nächsten Entwicklungsmeilensteine und ihre Abnahmekriterien stehen im [macOS-Umsetzungsplan](docs/superpowers/plans/2026-11-14-symbol-logistik-macos-umsetzung.md#nächste-meilensteine).
+
 ## VS Code
 
 Den Repository-Ordner in VS Code öffnen und im Menü **Terminal → Task ausführen** einen Task wählen. **Spiel bauen** ist der Standard-Buildtask (⇧⌘B). **Spiel starten** baut und öffnet das Spiel. **Projekt prüfen** führt die Rust-Prüfungen und den Godot-Integrationstest aus. **macOS-App exportieren** schreibt den Universal-Build nach `dist/Symbol-Logistik.app`.

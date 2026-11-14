@@ -1,6 +1,6 @@
 # Symbol-Logistik · Umsetzungsplan für macOS
 
-**Ziel** ist eine installierbare Offline-App mit drehbarer 3D-Modellbahn und vollständigem Logistik-Spielkreislauf. Milestone 1 liefert den exportierten Mac-Build mit Startmenü und „Beenden“. Der anschließende technische Ausbau verbindet Straßenbau, Lieferung und Fortsetzen nach Neustart.
+**Ziel** ist eine installierbare Offline-App mit drehbarer 3D-Modellbahn und vollständigem Logistik-Spielkreislauf. Der aktuelle Stand ist Meilenstein 2. Meilenstein 3 beginnt mit einer automatischen Lkw-Lieferung auf dem vorhandenen Straßennetz.
 
 **Grundlage** sind die [Architektur-Spezifikation](../specs/2026-11-14-symbol-logistik-architektur.md), der [Spielentwurf](../specs/2026-11-14-symbol-logistik-design.md) und der [UX-Flow](../specs/2026-11-14-symbol-logistik-ux-flow.md). Der [abgelöste Browserplan](2026-11-14-symbol-logistik-implementation.md) dient als Referenz für seine fachlichen Szenarien und vorläufigen Balancingdaten.
 
@@ -12,26 +12,51 @@
 - Der Core bietet `Game::new(seed: &str) -> Result<Game, GameError>`, `Game::apply(command: CommandEnvelope) -> Result<CommandReceipt, GameError>`, `Game::preview_build(draft: &BuildDraft) -> Result<BuildQuote, GameError>`, `Game::step()`, `Game::view() -> GameView`, `Game::encode_save() -> Result<Vec<u8>, SaveError>` und `Game::decode_save(bytes: &[u8]) -> Result<Game, SaveError>`. Nur die bestätigenden Methoden und `step` ändern die Partie. `GameView` enthält stabile Objekt-IDs, Tick, Revision, Geometrie, Fahrzeugpositionen und die entdeckten Infos für den Inspektor. Die Extension übersetzt diese Aufrufe in Godot-Werte, wobei Spielstände als Bytes und sichtbare Ansichten als Daten übergeben werden.
 - Ein Bauentwurf enthält seine Basisrevision. Vor der Übernahme prüft der Core die gesamte Operation gegen den aktuellen Zustand und bestätigt eine neue Revision nur nach Erfolg. Erfolgreiche Befehls-IDs und ihre Ergebnisse bleiben für Wiederholungen innerhalb desselben Spielstands verfügbar. Die Tickzahl läuft separat. Ganzzahlige Warenmengen in Tausendsteln, gespeicherte Zufallsströme und stabile ID-Reihenfolge machen die Simulation reproduzierbar.
 
-## Milestone 1 · Grundgerüst und Startmenü
+## Meilenstein 1 · Grundgerüst und Startmenü
 
 1. Cargo-Workspace mit engine-unabhängigem Core und Rust-GDExtension einrichten. Rust, Godot-API und Cargo-Abhängigkeiten festlegen. Die Bibliotheken kompilieren und den Core für WebAssembly bauen.
 2. Das Startmenü als Godot-Hauptszene einrichten. „Neue Partie“, „Fortsetzen“ und „Spielstand“ deaktivieren. „Beenden“ verbindet das Button-Signal mit der Rust-Methode. Ein Integrationstest prüft die Menüeinträge und das Beenden per Eingabetaste.
 3. Die macOS-App exportieren, außerhalb des Editors öffnen und im nativen Fenster alle vier Schaltflächen anklicken. Der Prozess endet bei „Beenden“. Die Build-Schritte und die geprüfte Plattform stehen in der [README](../../../README.md).
 
-## 1. Technischer Ausbau auf dem Mac
+## Meilenstein 2 · Generierte Stadt
 
-1. **Rust-Core und Seed-Karte.** Workspace und Core einrichten. Eine kleine verbundene Karte mit einer seedabhängigen Kreuzung, einer Quelle, einem Lager und legalem Platz für eine zusätzliche Straße erzeugen. Die Straßengeometrie als Polylinien in der ebenen Welt halten. Tests belegen gleiche Karte bei gleichem Seed, erreichbare Anschlüsse und stabile IDs nach dem Bau. `cargo test -p builder-core` und `cargo build -p builder-core --target wasm32-unknown-unknown` prüfen.
-2. **Bau und laufende Lieferung.** `CommandEnvelope`, `BuildDraft` und `BuildQuote` einführen. Eine Straße mit Anschlussprüfung, Materialkosten und atomarer Bestätigung umsetzen. Aus Quelle, Lkw und Lager eine echte automatische Lieferung mit Reservierung, Laden, Fahrt und Entladen ausführen. Tests prüfen unveränderten Zustand nach Vorschau und ungültigem oder veraltetem Entwurf, einmalige Kosten bei doppelter Befehls-ID und Warenerhalt nach der Lieferung. Die Fahrposition stammt aus dem Core.
-3. **3D-Client anbinden.** Straßen und Kreuzung aus Core-Geometrie zeichnen, einfache Modelle für Gebäude und Lkw verwenden und die ebene Baufläche mit einer schrägen, drehbaren Godot-Kamera darstellen. Ein Klick führt über einen Strahl aus der Kamera zur Auswahl oder zu einem Baupunkt in Weltkoordinaten. Prüfen, dass dieselbe Kreuzung nach einer Kameradrehung dieselbe Objekt-ID liefert. Bauvorschau und Anwendung über die Extension anbinden. Die Darstellung interpoliert Fahrzeugpositionen. Ein begrenztes Schrittbudget steuert die 50-ms-Simulation bei 1×, 2× und 4×. Beim Minimieren und Wiederherstellen entsteht kein Nachholstau. Manuelle Pause und Fensterpause wirken unabhängig.
-4. **Speichern und fortsetzen.** Formatversion und fachlichen Zustand einschließlich Zufallsströmen, Reservierungen, aktiver Ladung, Position und Auftragsfortschritt als JSON kodieren. Autosave und manuelle Sicherung getrennt in Godots lokalem App-Datenverzeichnis führen. Beim Schreiben eine temporäre Datei im selben Verzeichnis anlegen, vollständig schreiben und danach den Slot ersetzen. Core-Tests vergleichen ununterbrochenen Lauf mit Speichern, Laden und derselben Zahl weiterer Schritte. Im Client beschädigte oder neuere Versionen ablehnen. Einen Schreibfehler auslösen und prüfen, dass alter Slot, laufende Partie und Export an einen beschreibbaren Ort verfügbar bleiben.
-5. **Mac-App abnehmen.** Export mit passender Apple-Silicon-Extension bauen und die `.app` außerhalb des Editors offline starten. Dieselbe Kreuzung aus zwei Kamerawinkeln auswählen, eine Straße bauen und eine Lieferung beobachten. Während der Fahrt speichern, die App vollständig beenden und neu öffnen. Prüfen, dass derselbe Lkw mit Ladung und Auftrag fortsetzt und das Lager die Waren genau einmal erhält. Export und Import derselben Datei praktisch prüfen. Asset- und Versionsstand sowie Gerät und macOS-Version festhalten.
+„Neue Partie → Starten“ öffnet eine reproduzierbare Raster- oder Ringstadt mit Wohnhäusern, zwei Rohstoffvorkommen, Zentrallager und freien Parzellen am Straßennetz. WASD verschiebt die Ansicht. Bekannte Seeds und die bisherige Abnahme stehen in der [README](../../../README.md).
 
-## 2. Vollständigen Kreislauf ausbauen
+## Nächste Meilensteine
 
-1. **Welt und Produktion.** Die Startkarte um Raster- und unregelmäßige Viertel, Stadtwachstum, freie Polyline-Straßen mit echten Kreuzungen und platzierbare Betriebe erweitern. Abbau, sechs Symboltypen, seedabhängige azyklische Rezepte, begrenzte Lager und automatische Bedarfe umsetzen. Jeweils die Spielszene mit den zugehörigen Bau- und Rezeptansichten ergänzen. Prüfen, dass Wachstum keine Reservierungen oder Spielerbauten überschreibt und volle Lager nachvollziehbar blockieren.
-2. **Verkehr, Disposition und Diagnose.** Spurgraph, Einbahn, Abbiegespuren, Vorfahrt, Stoppschilder, Kreisverkehre, Ampelsteuerung und Ampeldefekt umsetzen. Automatische Aufträge reservieren Waren und Platz einmalig. Bevorzugte und verbindliche Lieferanten und Routen unterscheiden. Rückstau, reservierte Waren und verbindliche Blockaden im Inspektor erklären und zur Ursache springen. Praktisch prüfen, dass Phasenanpassung und Ampelversatz in den dokumentierten Lastfällen den Durchsatz verbessern.
-3. **Fortschritt und Fernverkehr.** Ausdrückliche Zielabgabe mit Reserveschutz und einem Fenster von 60 Simulationssekunden umsetzen. Nach den ersten vier von fünf Meilensteinen je drei gültige Wahlangebote zeigen. Zweite Zone, zwei Terminals und bidirektionalen Zugverkehr mit echtem Umschlag ergänzen. Freischaltungswahl, offene Zielabgabe und Ampeldefekt in den Spielstand-Rundlauf aufnehmen. Testen, dass die zweite Zone bei Nichtwahl erneut angeboten werden kann und die fünf Ziele auch ohne sie erreichbar bleiben.
-4. **Sanierung und vollständige Speicherung.** Rückbau, Fahrzeugbergung und zweckgebundene Bauhilfe so umsetzen, dass Rückerstattungen und Ladungen genau einmal verbucht und Reservierungen vollständig freigegeben werden. Einen Netzkollaps ohne verfügbare Baustoffe bis zur wieder laufenden Lieferung spielen. Bei fehlendem `releaseEnabled` in einer unterstützten Spielstandversion startet die Zielabgabe gesperrt. Einen Wechsel mit ungesicherter Partie und fehlgeschlagenem Speichern gemäß UX-Flow prüfen.
-5. **Mac-Gesamtabnahme.** Mindestens 100 Seeds automatisiert auf gültige Starts und Freischaltungsfolgen prüfen. In der exportierten App eine Raster- und eine unregelmäßige Partie bis zum fünften Ziel spielen, davon eine mit funktionierender Bahn in beide Richtungen. Danach weiterbauen und speichern. Alle UX-Abnahmeszenarien einschließlich Tastatur, Graustufen und der beiden Fenstergrößen praktisch prüfen. Mit ungefähr 100 Lkw und zwei Zügen bei 1× nach 60 Sekunden Warmlauf für 120 Sekunden messen. Dabei zoomen und drehen. Gerät, OS, Seed, Fahrzeugzahl, Bildrate und Simulationsrückstand festhalten. Ziel sind in der Regel mindestens 30 FPS und kein wachsender Rückstand.
+Die Nummern bezeichnen Entwicklungsmeilensteine. Die fünf Lieferziele sind Fortschrittsstufen innerhalb einer Partie. Für die erste Produktionskette genügen die vorhandenen Straßen und Parzellen. Der freie Straßenbau folgt, sobald sich seine Auswirkung an einer laufenden Lieferung prüfen lässt.
+
+### Meilenstein 3 · Erste Lkw-Lieferung
+
+- Einen Abbaubetrieb auf einem Rohstoffvorkommen setzen. Ein Lkw des Zentrallagers holt den Rohstoff automatisch ab. Der Core bestimmt Route und Fahrposition. Der Inspektor zeigt Bestand, Ladung und Lieferstatus.
+- **Abnahme.** Auf Raster- und Ringkarte eine vollständige Lieferung vom Abbau bis zur Einbuchung beobachten. Core-Tests prüfen, dass der Auftrag Ware und Zielkapazität jeweils einmal reserviert und die Ladung genau einmal einbucht.
+
+### Meilenstein 4 · Erste Produktionskette
+
+- Beide Rohstoffe erschließen, eine Fabrik auf einer freien Parzelle bauen und ein kombiniertes Produkt herstellen. Automatische Aufträge versorgen die Fabrik und liefern das Produkt ans Zentrallager. Begrenzte Lager und fehlende Zutaten sind im Inspektor sichtbar.
+- Die ausdrückliche Zielabgabe misst Liefermenge und durchschnittliche Lieferrate über 60 Simulationssekunden. Reservierte Waren bleiben für ihre Aufträge verfügbar. Eine Pause hält Produktion, Fahrten und Ratenfenster an.
+- **Abnahme.** In der exportierten Mac-App eine Partie vom Hauptmenü bis zum ersten Lieferziel spielen. Fehlende Zutaten und volle Lager beobachten, die Ursache im Inspektor erkennen und prüfen, dass die Simulationszeit während einer Pause stehen bleibt.
+
+### Meilenstein 5 · Straßennetz ändern und Partie fortsetzen
+
+- Eine Straße als Polyline mit Anschlussprüfung, Kostenanzeige und revisionsgebundener Bauvorschau bauen. Eine Lieferaufgabe macht durch die neue Verbindung eine Route möglich oder kürzer. Zoom und Drehung unterstützen Auswahl und Bau. Die 50-ms-Simulation nutzt bei 1×, 2× und 4× ein begrenztes Schrittbudget. Manuelle Pause und Fensterpause wirken unabhängig, beim Wiederherstellen entsteht kein Nachholstau.
+- Versionierte JSON-Spielstände enthalten auch aktive Aufträge, Reservierungen, Ladung und Fahrposition. Automatischen und manuellen Stand getrennt im App-Datenverzeichnis führen und atomar ersetzen. Ungültige oder neuere Dateien ablehnen. Bei Schreibfehlern bleiben der bisherige Slot und die laufende Partie erhalten. Import und Export verwenden dasselbe Format.
+- **Abnahme.** Dieselbe Kreuzung aus zwei Kamerawinkeln auswählen, die Straße bauen und einen Lkw auf der neuen Route beobachten. Während der beladenen Fahrt speichern, die App vollständig beenden, offline neu starten und dieselbe Lieferung genau einmal abschließen. Import, Export und Schreibfehler praktisch prüfen. Im Core den ununterbrochenen Lauf mit dem gespeicherten und fortgesetzten Lauf vergleichen. Prüfen, dass abgelehnte Vorschauen den Zustand erhalten und wiederholte Befehle keine doppelten Kosten verursachen.
+
+### Meilenstein 6 · Verkehr steuern und Engpässe beheben
+
+- Mehrere Lkw, Spurgraph, Vorfahrt, Stoppschilder, Einbahnstraßen, Abbiegespuren, Kreisverkehre und Ampeln einführen. Zeitlich begrenzte Ampeldefekte schalten nach dem ersten Spielziel auf sichere Vorfahrt. Bevorzugte und verbindliche Lieferanten und Routen unterscheiden. Der Inspektor erklärt Lieferblockaden und führt zur Ursache.
+- Rückbau, Fahrzeugbergung und zweckgebundene Bauhilfe geben Reservierungen frei und erhalten Ladungen und Rückerstattungen. Die Hilfe deckt den Fehlbestand des bestätigten Sanierungsplans.
+- **Abnahme.** In reproduzierbaren Lastfällen durch Abbiegespur, Phasenanpassung und Ampelversatz den Durchsatz messbar verbessern. Bei einem vollständigen Stillstand mit leerem Baustofflager ohne Warenverlust wieder liefern. Die Auswirkung eines Ampeldefekts im Spiel nachvollziehen.
+
+### Meilenstein 7 · Freischaltungen und Güterbahn
+
+- Fünf Lieferziele mit je drei gültigen Angeboten nach den ersten vier Zielen umsetzen. Sechs Symboltypen, seedabhängige azyklische Rezepte und Stadtwachstum ergänzen. Die optionale zweite Zone bringt eine neue Quelle und zwei Terminals für bidirektionalen Güterverkehr mit echtem Umschlag. Die Zone kann später erneut angeboten werden. Stadtwachstum schützt reservierte Flächen und Spielerbauten.
+- **Abnahme.** Raster- und Ringkarte bis Ziel fünf spielen, einmal mit und einmal ohne zweite Zone. Im Bahndurchlauf Zutaten in die zweite Zone liefern, das dort hergestellte Produkt zurückbringen und auf derselben Karte weiterspielen. Mindestens 100 Seeds automatisiert auf gültige Starts, erreichbare Lieferziele und gültige Wahlangebote prüfen.
+
+### Meilenstein 8 · Mac-Fassung abnehmen
+
+- Die exportierte App außerhalb des Editors offline durchspielen und die Szenarien aus Spielentwurf und UX-Flow prüfen. Eine gespeicherte Partie während Fahrt, Freischaltungswahl und Ampeldefekt wiederherstellen. Tastatur, Graustufen, Zoomstufen und beide vorgesehenen Fenstergrößen praktisch prüfen.
+- **Abnahme.** Mit etwa 100 Lkw und zwei Zügen bei 1× nach 60 Sekunden Warmlauf für 120 Sekunden messen und dabei zoomen und drehen. Ziel sind in der Regel mindestens 30 FPS und kein wachsender Simulationsrückstand. Gerät, macOS-Version, Build, Seeds, Fahrzeugzahlen und Ergebnisse je Kriterium dokumentieren.
 
 Windows und Linux folgen mit eigenen App-Paketen und einem Spielstand-Import aus der Mac-Fassung. Touch-Bedienung und die Entscheidung über einen Browserclient gehören zu späteren Paketen. Der WebAssembly-Build des Core bleibt Teil der technischen Prüfung.
