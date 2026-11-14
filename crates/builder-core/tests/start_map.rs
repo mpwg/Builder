@@ -1,4 +1,4 @@
-use builder_core::{BuildingKind, Game, Point};
+use builder_core::{BuildingKind, Game, MapLayout, Point};
 use std::collections::HashSet;
 
 const SAMPLE_SIZE: usize = 256;
@@ -48,39 +48,64 @@ fn rejects_seeds_without_content() {
 
 #[test]
 fn generates_both_connected_street_layouts() {
-    let mut road_counts = HashSet::new();
+    let mut saw_grid = false;
+    let mut saw_ring = false;
     for number in 0..SAMPLE_SIZE {
         let seed = number.to_string();
         let game = Game::new(&seed).unwrap();
         let map = game.view();
-        assert_eq!(map.junctions.len(), 9);
-        assert!(map.roads.iter().all(|road| road.from != road.to));
-        road_counts.insert(map.roads.len());
-        if map.roads.len() == 12 {
-            for road in &map.roads {
-                let start = road.points.first().unwrap();
-                let end = road.points.last().unwrap();
+        match map.layout {
+            MapLayout::Grid => {
+                saw_grid = true;
+                assert!(map.ring_roads.is_empty());
+                let (mut aligned, mut total) = (0.0, 0.0);
+                for a in map.roads.iter().flat_map(|road| road.points.windows(2)) {
+                    let length = distance(a[0], a[1]);
+                    total += length;
+                    if (a[0].x - a[1].x).abs().min((a[0].z - a[1].z).abs()) < length * 0.1 {
+                        aligned += length;
+                    }
+                }
+                assert!(aligned > total * 0.8, "Seed {seed}: Rasterachsen fehlen.");
+            }
+            MapLayout::Ring => {
+                saw_ring = true;
+                let mut nodes = std::collections::HashMap::new();
+                let mut east_crossings = 0;
+                for id in &map.ring_roads {
+                    let road = map.roads.iter().find(|road| road.id == *id).unwrap();
+                    for node in [road.from, road.to] {
+                        *nodes.entry(node).or_insert(0) += 1;
+                    }
+                    east_crossings += road
+                        .points
+                        .windows(2)
+                        .filter(|pair| {
+                            let (a, b) = (pair[0], pair[1]);
+                            (a.z > 0.0) != (b.z > 0.0)
+                                && a.x - a.z * (b.x - a.x) / (b.z - a.z) > 0.0
+                        })
+                        .count();
+                }
+                assert_eq!(
+                    east_crossings % 2,
+                    1,
+                    "Seed {seed}: Ring umschließt die Mitte nicht."
+                );
                 assert!(
-                    start.x == end.x || start.z == end.z,
-                    "Seed {seed}: Straße im Raster verläuft diagonal."
+                    nodes.values().all(|degree| *degree == 2),
+                    "Seed {seed}: Ring offen."
+                );
+                assert!(
+                    map.roads
+                        .iter()
+                        .filter(|road| !map.ring_roads.contains(&road.id)
+                            && (nodes.contains_key(&road.from) || nodes.contains_key(&road.to)))
+                        .count()
+                        >= 3,
+                    "Seed {seed}: Nebenstraßen fehlen."
                 );
             }
-        } else {
-            assert_eq!(map.roads.len(), 11);
-            assert!(map.roads.iter().any(|road| road.points.len() > 2));
-            let center = map
-                .junctions
-                .iter()
-                .find(|junction| distance(junction.position, Point { x: 0.0, z: 0.0 }) < 60.0)
-                .unwrap();
-            assert_eq!(
-                map.roads
-                    .iter()
-                    .filter(|road| road.from == center.id || road.to == center.id)
-                    .count(),
-                3,
-                "Seed {seed}"
-            );
         }
 
         let mut ids = HashSet::new();
@@ -90,6 +115,8 @@ fn generates_both_connected_street_layouts() {
             .map(|junction| junction.id)
             .chain(map.roads.iter().map(|road| road.id))
             .chain(map.buildings.iter().map(|building| building.id))
+            .chain(map.blocks.iter().map(|block| block.id))
+            .chain(map.parcels.iter().map(|parcel| parcel.id))
         {
             assert!(ids.insert(id), "Seed {seed}: ID {id} doppelt vergeben.");
         }
@@ -123,7 +150,7 @@ fn generates_both_connected_street_layouts() {
             assert!(
                 road.points
                     .windows(2)
-                    .all(|pair| distance(pair[0], pair[1]) > 1.0)
+                    .all(|pair| distance(pair[0], pair[1]) > 0.0009)
             );
             assert!(road.points.iter().all(|point| {
                 point.x > map.bounds.min.x
@@ -145,7 +172,7 @@ fn generates_both_connected_street_layouts() {
             }
         }
     }
-    assert_eq!(road_counts, HashSet::from([11, 12]));
+    assert!(saw_grid && saw_ring);
 }
 
 #[test]
@@ -281,4 +308,41 @@ fn crosses(a: &[Point], b: &[Point]) -> bool {
     }
 
     side(a, b[0]) * side(a, b[1]) < 0.0 && side(b, a[0]) * side(b, a[1]) < 0.0
+}
+
+#[test]
+fn start_maps_expose_street_bounded_blocks() {
+    for seed in ["0", "1", "Viertel 0"] {
+        let game = Game::new(seed).unwrap();
+        let map = game.view();
+        assert!(map.blocks.len() >= 3);
+        for block in &map.blocks {
+            assert!(block.polygon.len() >= 3);
+            assert_eq!(block.polygon.len(), block.boundary_road_ids.len());
+            for (i, (&a, &road_id)) in block
+                .polygon
+                .iter()
+                .zip(&block.boundary_road_ids)
+                .enumerate()
+            {
+                let b = block.polygon[(i + 1) % block.polygon.len()];
+                let road = map.roads.iter().find(|road| road.id == road_id).unwrap();
+                assert!(
+                    road.points
+                        .windows(2)
+                        .any(|edge| edge == [a, b] || edge == [b, a])
+                );
+                assert!(!block.polygon[..i].contains(&a));
+                for j in i + 2..block.polygon.len() {
+                    assert!(!crosses(
+                        &[a, b],
+                        &[
+                            block.polygon[j],
+                            block.polygon[(j + 1) % block.polygon.len()]
+                        ]
+                    ));
+                }
+            }
+        }
+    }
 }

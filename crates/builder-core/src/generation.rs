@@ -1,4 +1,4 @@
-use crate::{Bounds, Building, BuildingKind, GameError, Junction, MapView, Point, Road};
+use crate::{Bounds, Building, BuildingKind, GameError, MapLayout, MapView, Point, Road};
 
 const BOUNDS: Bounds = Bounds {
     min: Point {
@@ -9,119 +9,42 @@ const BOUNDS: Bounds = Bounds {
 };
 const ROAD_CLEARANCE: f32 = 10.0;
 const BUILDING_CLEARANCE: f32 = 4.0;
-const GRID_EDGES: [(usize, usize); 12] = [
-    (0, 1),
-    (1, 2),
-    (3, 4),
-    (4, 5),
-    (6, 7),
-    (7, 8),
-    (0, 3),
-    (3, 6),
-    (1, 4),
-    (4, 7),
-    (2, 5),
-    (5, 8),
-];
-const RING: [(f32, f32); 9] = [
-    (-300.0, -156.0),
-    (-91.0, -235.0),
-    (180.0, -205.0),
-    (344.0, -36.0),
-    (255.0, 171.0),
-    (51.0, 236.0),
-    (-218.0, 204.0),
-    (-344.0, 43.0),
-    (0.0, 0.0),
-];
+mod streets;
 
 pub(crate) fn generate(seed: &str) -> Result<MapView, GameError> {
     let mut random = Random::from_seed(seed);
-    let (junctions, roads) = street_network(&mut random);
-    let buildings = Buildings {
-        roads: &roads,
-        placed: Vec::new(),
-    }
-    .generate(&mut random)?;
-
-    Ok(MapView {
-        seed: seed.to_owned(),
-        bounds: BOUNDS,
-        junctions,
-        roads,
-        buildings,
-    })
-}
-
-fn street_network(random: &mut Random) -> (Vec<Junction>, Vec<Road>) {
-    let grid = random.next() & 1 == 0;
-    let junctions: Vec<_> = if grid {
-        let xs = [
-            -325.0 + random.between(-28.0, 28.0),
-            random.between(-39.0, 39.0),
-            325.0 + random.between(-28.0, 28.0),
-        ];
-        let zs = [
-            -224.0 + random.between(-27.0, 27.0),
-            random.between(-38.0, 38.0),
-            224.0 + random.between(-27.0, 27.0),
-        ];
-        zs.into_iter()
-            .flat_map(|z| xs.map(|x| Point { x, z }))
-            .collect::<Vec<_>>()
+    let layout = if random.next() & 1 == 0 {
+        MapLayout::Grid
     } else {
-        RING.into_iter()
-            .map(|(x, z)| Point {
-                x: x + random.between(-31.0, 31.0),
-                z: z + random.between(-25.0, 25.0),
-            })
-            .collect()
-    }
-    .into_iter()
-    .enumerate()
-    .map(|(index, position)| Junction {
-        id: index as u32 + 1,
-        position,
-    })
-    .collect();
-
-    let edges = if grid {
-        GRID_EDGES.to_vec()
-    } else {
-        let first_spoke = (random.next() % 8) as usize;
-        (0..8)
-            .map(|index| (index, (index + 1) % 8))
-            .chain([0, 3, 6].map(|offset| ((first_spoke + offset) % 8, 8)))
-            .collect()
+        MapLayout::Ring
     };
-    let roads = edges
-        .into_iter()
-        .enumerate()
-        .map(|(index, (from, to))| {
-            let start = junctions[from].position;
-            let end = junctions[to].position;
-            let mut points = vec![start];
-            if !grid {
-                let delta = end.minus(start);
-                let normal = delta.normal();
-                let bend = random.between(-16.0, 16.0);
-                points.extend([
-                    start.offset(delta, 1.0 / 3.0).offset(normal, bend),
-                    start.offset(delta, 2.0 / 3.0).offset(normal, bend * 0.8),
-                ]);
-            }
-            points.push(end);
-
-            Road {
-                id: index as u32 + 101,
-                from: junctions[from].id,
-                to: junctions[to].id,
-                points,
-            }
+    for _ in 0..16 {
+        let Some(streets) = streets::trace(layout, random.next()) else {
+            continue;
+        };
+        let Ok(buildings) = (Buildings {
+            roads: &streets.roads,
+            placed: Vec::new(),
         })
-        .collect();
-
-    (junctions, roads)
+        .generate(&mut random) else {
+            continue;
+        };
+        if buildings.len() < 24 {
+            continue;
+        }
+        return Ok(MapView {
+            seed: seed.to_owned(),
+            bounds: BOUNDS,
+            layout,
+            blocks: streets.blocks,
+            parcels: Vec::new(),
+            ring_roads: streets.ring_roads,
+            junctions: streets.junctions,
+            roads: streets.roads,
+            buildings,
+        });
+    }
+    Err(GameError::NoLogisticsSite)
 }
 
 struct Buildings<'a> {
