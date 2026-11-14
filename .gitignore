@@ -1,0 +1,5 @@
+.DS_Store
+/target/
+/game/.godot/
+/game/bin/
+/dist/

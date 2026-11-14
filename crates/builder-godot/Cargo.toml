@@ -1,0 +1,11 @@
+[package]
+name = "builder-godot"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+godot = { version = "=0.5.5", default-features = false, features = ["api-4-7"] }
