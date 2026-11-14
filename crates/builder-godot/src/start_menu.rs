@@ -1,6 +1,6 @@
 use builder_core::Game;
 use godot::classes::{
-    Button, Control, IControl, InputEvent, Label, PackedScene, RandomNumberGenerator,
+    Button, Control, IControl, InputEvent, Label, Os, PackedScene, RandomNumberGenerator,
 };
 use godot::global::Error;
 use godot::prelude::*;
@@ -84,9 +84,14 @@ impl StartMenu {
     }
 
     fn open_map(&self) -> Result<(), ()> {
-        let mut rng = RandomNumberGenerator::new_gd();
-        rng.randomize();
-        let seed = format!("{:08x}{:08x}", rng.randi(), rng.randi());
+        let fixed_seed = Os::singleton().get_environment("BUILDER_MAP_SEED");
+        let seed = if fixed_seed.is_empty() {
+            let mut rng = RandomNumberGenerator::new_gd();
+            rng.randomize();
+            format!("{:08x}{:08x}", rng.randi(), rng.randi())
+        } else {
+            fixed_seed.to_string()
+        };
         let game = Game::new(&seed).map_err(|_| ())?;
         let scene = try_load::<PackedScene>("res://scenes/map.tscn").map_err(|_| ())?;
         let node = scene.instantiate().ok_or(())?;

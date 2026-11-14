@@ -1,4 +1,4 @@
-use builder_core::{Building, BuildingKind, MapView};
+use builder_core::{Building, BuildingKind, MapView, RoadAccess};
 use godot::classes::{
     BoxMesh, CylinderMesh, Mesh, MeshInstance3D, Node3D, PrismMesh, StandardMaterial3D,
 };
@@ -6,7 +6,7 @@ use godot::prelude::*;
 
 use super::ground_position;
 
-const ROAD_WIDTH: f32 = 13.0;
+mod parcels;
 
 pub(super) fn build(world: &mut Gd<Node3D>, map: &MapView) {
     let grass = material(0x63824c);
@@ -37,16 +37,31 @@ pub(super) fn build(world: &mut Gd<Node3D>, map: &MapView) {
         &base,
     );
 
+    parcels::build(world, map);
+
     for junction in &map.junctions {
+        let width = map
+            .roads
+            .iter()
+            .filter(|road| road.from == junction.id || road.to == junction.id)
+            .map(|road| road.width)
+            .fold(0.0, f32::max);
         add_disc(
             world,
             ground_position(junction.position) + Vector3::DOWN * 0.015,
-            ROAD_WIDTH * 0.5,
+            width * 0.5,
             24,
             &asphalt,
         );
     }
     for road in &map.roads {
+        let road_length: f32 = road
+            .points
+            .windows(2)
+            .map(|points| ground_position(points[0]).distance_to(ground_position(points[1])))
+            .sum();
+        let mut traversed = 0.0;
+        let mut next_mark = 14.0;
         for points in road.points.windows(2) {
             let a = ground_position(points[0]);
             let b = ground_position(points[1]);
@@ -56,25 +71,28 @@ pub(super) fn build(world: &mut Gd<Node3D>, map: &MapView) {
             let road_surface = add_box(
                 world,
                 (a + b) * 0.5,
-                Vector3::new(ROAD_WIDTH, 0.4, length),
+                Vector3::new(road.width, 0.4, length),
                 &asphalt,
             );
             set_yaw(road_surface, angle);
-            for offset in (14..(length as usize).saturating_sub(11)).step_by(13) {
+            // Der Abstand läuft über die vollständige Straße, auch an kurzen Kurvensegmenten.
+            while next_mark < traversed + length && next_mark < road_length - 11.0 {
                 let mark = add_box(
                     world,
-                    a + delta.normalized() * offset as f32 + Vector3::UP * 0.22,
+                    a + delta.normalized() * (next_mark - traversed) + Vector3::UP * 0.22,
                     Vector3::new(0.55, 0.04, 5.0),
                     &markings,
                 );
                 set_yaw(mark, angle);
+                next_mark += 13.0;
             }
+            traversed += length;
         }
-        for &point in &road.points[1..road.points.len() - 1] {
+        for points in road.points.windows(3) {
             add_disc(
                 world,
-                ground_position(point) + Vector3::DOWN * 0.015,
-                ROAD_WIDTH * 0.5,
+                ground_position(points[1]) + Vector3::DOWN * 0.015,
+                road.width * 0.5,
                 24,
                 &asphalt,
             );
@@ -91,7 +109,7 @@ pub(super) fn build(world: &mut Gd<Node3D>, map: &MapView) {
             let driveway = add_box(
                 world,
                 (start + end) * 0.5,
-                Vector3::new(7.0, 0.2, path.length()),
+                Vector3::new(RoadAccess::DRIVEWAY_WIDTH, 0.2, path.length()),
                 &gravel,
             );
             set_yaw(driveway, path.x.atan2(path.z));

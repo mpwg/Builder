@@ -1,8 +1,8 @@
 # Symbol-Logistik
 
-Symbol-Logistik ist ein Modellbahn-Logistikspiel für macOS. In Milestone 2 öffnet **Neue Partie → Starten** eine generierte Miniaturstadt mit neun Kreuzungen, Wohnhäusern, Zentrallager und zwei Rohstoffvorkommen. Bei jedem Start wird der Seed automatisch gewählt. Auf der Karte verschiebt **WASD** die Ansicht, **Escape** führt ins Hauptmenü zurück. Auf der Zwischenseite führen **Abbrechen** und **Escape** zurück zu „Neue Partie“.
+Symbol-Logistik ist ein Modellbahn-Logistikspiel für macOS. In Milestone 2 öffnet **Neue Partie → Starten** eine generierte Miniaturstadt mit Stadtblöcken, Wohnhäusern, Zentrallager und zwei Rohstoffvorkommen. Die goldenen Umrisse markieren freie Parzellen mit Straßenanschluss. Jeder ausgewiesene Stadtblock bietet mindestens einen solchen Bauplatz für einen Grundriss von 53 × 36 Karteneinheiten. Das Spiel wählt den Seed normalerweise automatisch. Auf der Karte verschiebt **WASD** die Ansicht, **Escape** führt ins Hauptmenü zurück. Auf der Zwischenseite führen **Abbrechen** und **Escape** zurück zu „Neue Partie“.
 
-- `crates/builder-core` erzeugt und besitzt die engine-unabhängigen Kartendaten. Ein Seed reproduziert dieselbe Karte mit Raster- oder Ringstraßennetz.
+- `crates/builder-core` erzeugt und besitzt die engine-unabhängigen Kartendaten. Ein Seed reproduziert dieselbe Raster- oder Ringkarte. Der Core erzeugt die Straßen mit `symbios-tensor`, leitet Stadtblöcke daraus ab und vergibt erschlossene Parzellen. Wenn keiner der bis zu 16 Entwürfe für den Seed nutzbar ist, kann im Startmenü eine neue Karte erzeugt werden.
 - `crates/builder-godot` ist die Rust-GDExtension. Sie verwaltet den Menüablauf, baut die Godot-Ansicht aus den Core-Daten und steuert die Kamera.
 - `game` enthält das Godot-Projekt, die deklarativen Szenen und das macOS-Exportprofil.
 - `preview` enthält die eigenständige Browser-Vorschau. Deren Modellbahn-Illustration liegt als WebP im Spielprojekt.
@@ -49,7 +49,7 @@ Der lokale Universal-Export ist ad hoc signiert. Auf einem MacBook Pro mit Apple
 
 ## Prüfen
 
-Die Rust-Core-Tests prüfen mit drei festen Seed-Reihen zu je 256 Karten die Reproduzierbarkeit und Variation, beide Netzformen, eindeutige IDs, Erreichbarkeit, Straßenverläufe, Gebäudeabstände und freie Zufahrten. Nach Build und Asset-Import prüft der Godot-Integrationstest Menü und Zwischenseite per Tastatur, einen Kartenfehler mit anschließendem Neustart der Erzeugung, den Szenenaufbau, alle WASD-Richtungen, gleichmäßiges diagonales Tempo, die Kartenbegrenzung und Stillstand beim Loslassen, Escape und Beenden.
+Die Rust-Core-Tests prüfen mit drei festen Seed-Reihen zu je 256 Karten die Reproduzierbarkeit und Variation, geschlossene Ringe, zusammenhängende Straßennetze, Blockgrenzen, Parzellengrenzen, gedrehte Grundrisse und freie Zufahrten. Je Block prüfen sie außerdem den Platz für einen weiteren Logistikbau. Nach Build und Asset-Import prüft der Godot-Integrationstest Menü und Zwischenseite per Tastatur, einen Kartenfehler mit anschließendem Neustart der Erzeugung, den Szenenaufbau für die Rasterkarte mit Seed `0` und die Ringkarte mit Seed `1`, sichtbare Parzellengrenzen, alle WASD-Richtungen, gleichmäßiges diagonales Tempo, die Kartenbegrenzung und Stillstand beim Loslassen, Escape und Beenden.
 
 ```fish
 set -l godot /Applications/Godot.app/Contents/MacOS/Godot
@@ -59,3 +59,5 @@ cargo test --locked --workspace
 cargo build --locked -p builder-core --target wasm32-unknown-unknown
 $godot --headless --path game --script "$PWD/tests/start_menu.gd"
 ```
+
+Für die visuelle Abnahme im Godot-Fenster startet `env BUILDER_MAP_SEED=0 /pfad/zu/Godot --path game` die Rasterkarte über **Neue Partie → Starten**. Mit `BUILDER_MAP_SEED=1` lässt sich die Ringkarte auf dieselbe Weise öffnen.
