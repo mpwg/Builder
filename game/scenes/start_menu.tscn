@@ -146,7 +146,7 @@ theme_override_constants/separation = 9
 [node name="NewGame" type="Button" parent="Menu/Actions"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-disabled = true
+mouse_default_cursor_shape = 2
 text = "Neue Partie"
 alignment = 0
 
@@ -171,4 +171,46 @@ mouse_default_cursor_shape = 2
 text = "Beenden"
 alignment = 0
 
+[node name="Setup" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 76.0
+offset_right = 420.0
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Setup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.99, 0.95, 0.85, 1)
+theme_override_fonts/font = SubResource("SystemFont_title")
+theme_override_font_sizes/font_size = 42
+text = "Neue Partie"
+
+[node name="Start" type="Button" parent="Setup"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Starten"
+alignment = 0
+
+[node name="Cancel" type="Button" parent="Setup"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "Abbrechen"
+alignment = 0
+
+[node name="Error" type="Label" parent="Setup"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.83, 0.72, 1)
+autowrap_mode = 3
+text = "Die Karte konnte nicht erzeugt werden. Versuche es erneut."
+
+[connection signal="pressed" from="Menu/Actions/NewGame" to="." method="open_new_game"]
 [connection signal="pressed" from="Menu/Actions/Quit" to="." method="quit_game"]
+[connection signal="pressed" from="Setup/Start" to="." method="start_new_game"]
+[connection signal="pressed" from="Setup/Cancel" to="." method="cancel_new_game"]

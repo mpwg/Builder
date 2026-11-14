@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="Environment" id="Environment_map"]
+background_mode = 1
+background_color = Color(0.052, 0.082, 0.07, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.83, 0.9, 1, 1)
+ambient_light_energy = 0.64
+reflected_light_source = 1
+
+[node name="MapScene" type="MapScene"]
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_map")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-48, -35, 0)
+light_color = Color(1, 0.91, 0.79, 1)
+light_energy = 0.95
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+projection = 1
+current = true
+size = 460.0
+far = 1800.0
