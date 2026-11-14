@@ -207,9 +207,12 @@ fn ring_boundary(
     let spoke_count = perimeter
         .iter()
         .filter(|&&node| {
-            adjacency[node as usize]
-                .iter()
-                .any(|&other| !ring.contains(&edge_key(node, other)) && !nodes.contains(&other))
+            let position = graph.node_pos(node);
+            let outward = (position - CENTER).normalize();
+            adjacency[node as usize].iter().any(|&other| {
+                !nodes.contains(&other)
+                    && (graph.node_pos(other) - position).normalize().dot(outward) > 0.5
+            })
         })
         .count();
     (tangential >= length * 0.70 && spoke_count >= 3).then_some(ring)
@@ -306,4 +309,28 @@ fn export(
         blocks,
         ring_roads,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use symbios_tensor::{CityBlock as TensorBlock, RoadType};
+
+    #[test]
+    fn inward_dead_ends_do_not_count_as_spokes() {
+        let mut graph = RoadGraph::default();
+        let ring: Vec<_> = (0..8)
+            .map(|i| {
+                let angle = std::f32::consts::TAU * i as f32 / 8.0;
+                graph.add_node(CENTER + Vec2::from_angle(angle) * 120.0)
+            })
+            .collect();
+        for (a, b) in perimeter_edges(&ring) {
+            graph.add_edge(a, b, RoadType::Major);
+            let end = graph.add_node(graph.node_pos(a).lerp(CENTER, 0.2));
+            graph.add_edge(a, end, RoadType::Minor);
+        }
+        graph.blocks.push(TensorBlock { perimeter: ring });
+        assert!(ring_boundary(&graph, &active_adjacency(&graph)).is_none());
+    }
 }

@@ -55,6 +55,10 @@ pub struct RoadAccess {
     pub point: Point,
 }
 
+impl RoadAccess {
+    pub const DRIVEWAY_WIDTH: f32 = 4.0;
+}
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Footprint {
     pub position: Point,
@@ -134,15 +138,15 @@ pub struct MapView {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GameError {
     EmptySeed,
-    NoLogisticsSite,
+    NoUsableStartMap,
 }
 
 impl fmt::Display for GameError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::EmptySeed => formatter.write_str("Gib einen Seed ein."),
-            Self::NoLogisticsSite => formatter
-                .write_str("Die Startkarte bietet keinen Platz für alle Logistikstandorte."),
+            Self::NoUsableStartMap => formatter
+                .write_str("Für diesen Seed konnte keine bebaubare Startkarte erzeugt werden."),
         }
     }
 }

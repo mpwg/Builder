@@ -1,4 +1,4 @@
-use builder_core::{BuildingKind, Game, MapLayout, Point};
+use builder_core::{BuildingKind, Footprint, Game, MapLayout, Point, RoadAccess};
 use std::collections::HashSet;
 
 const SAMPLE_SIZE: usize = 256;
@@ -207,73 +207,129 @@ fn places_clear_building_footprints_and_accessible_logistics_sites() {
             .unwrap();
         assert!(distance(warehouse.position, Point { x: 0.0, z: 0.0 }) < 180.0);
 
-        for (index, building) in map.buildings.iter().enumerate() {
-            assert!(building.width > 0.0 && building.depth > 0.0 && building.height > 0.0);
-            assert!(building.facing.is_finite());
-            // Der Umkreis enthält den gesamten gedrehten Grundriss.
-            let radius = building.width.hypot(building.depth) * 0.5;
-            let position = building.position;
+        for building in &map.buildings {
+            assert!(building.height > 0.0);
+            let parcel = map
+                .parcels
+                .iter()
+                .find(|parcel| parcel.building_id == Some(building.id))
+                .expect("Jedes Gebäude steht auf einer Parzelle.");
+            let footprint = Footprint {
+                position: building.position,
+                facing: building.facing,
+                width: building.width,
+                depth: building.depth,
+            };
+            assert!(footprint.width > 0.0 && footprint.depth > 0.0 && footprint.facing.is_finite());
             assert!(
-                position.x - radius >= map.bounds.min.x && position.x + radius <= map.bounds.max.x
+                footprint
+                    .corners()
+                    .iter()
+                    .all(|&corner| within(&parcel.polygon, corner))
+            );
+            assert_eq!(building.access, Some(parcel.access.road_id));
+            assert_eq!(building.access_point, parcel.access.point);
+        }
+        assert_eq!(
+            map.parcels
+                .iter()
+                .filter(|parcel| parcel.building_id.is_some())
+                .count(),
+            map.buildings.len()
+        );
+
+        for (index, parcel) in map.parcels.iter().enumerate() {
+            let block = map
+                .blocks
+                .iter()
+                .find(|block| block.id == parcel.block_id)
+                .unwrap();
+            assert!(
+                parcel
+                    .polygon
+                    .iter()
+                    .all(|&point| within(&block.polygon, point))
             );
             assert!(
-                position.z - radius >= map.bounds.min.z && position.z + radius <= map.bounds.max.z
+                edges(&parcel.polygon).all(|a| edges(&block.polygon).all(|b| !crosses(&a, &b)))
             );
-            for other in &map.buildings[index + 1..] {
-                let other_radius = other.width.hypot(other.depth) * 0.5;
-                assert!(
-                    distance(position, other.position) >= radius + other_radius + 4.0,
-                    "Seed {seed}: Gebäude {} und {} stehen zu dicht.",
-                    building.id,
-                    other.id
-                );
-            }
+            let footprint = if parcel.building_id.is_none() {
+                assert!(parcel.buildable.width >= 53.0 && parcel.buildable.depth >= 36.0);
+                Footprint {
+                    width: 53.0,
+                    depth: 36.0,
+                    ..parcel.buildable
+                }
+            } else {
+                parcel.buildable
+            };
+            let corners = footprint.corners();
+            assert!(corners.iter().all(|&point| within(&parcel.polygon, point)));
+            let driveway = [footprint.front(), parcel.access.point];
+            let length = distance(driveway[0], driveway[1]);
+            assert!(length > 6.5 && length < 30.0);
+            assert!(
+                (distance(footprint.position, driveway[1]) - length - footprint.depth * 0.5).abs()
+                    < 0.001
+            );
+
             let road = map
                 .roads
                 .iter()
-                .find(|road| Some(road.id) == building.access)
+                .find(|road| road.id == parcel.access.road_id)
                 .unwrap();
-            let front = Point {
-                x: position.x + building.facing.sin() * building.depth * 0.5,
-                z: position.z + building.facing.cos() * building.depth * 0.5,
-            };
-            let distance_to_access = road_distance(front, &road.points);
-            assert!(road_distance(building.access_point, &road.points) < 0.001);
-            assert!(
-                (distance(position, building.access_point)
-                    - distance(front, building.access_point)
-                    - building.depth * 0.5)
-                    .abs()
-                    < 0.001
-            );
-            assert!(
-                (10.0..=55.0).contains(&distance_to_access),
-                "Seed {seed}: Abstand zur Zufahrt: {distance_to_access}"
-            );
-            assert!(distance_to_access < road_distance(position, &road.points));
-            if building.kind != BuildingKind::House {
-                let driveway = [front, building.access_point];
-                for other in &map.buildings {
-                    if other.id != building.id {
-                        let other_radius = other.width.hypot(other.depth) * 0.5;
+            assert!(block.boundary_road_ids.contains(&road.id));
+            assert!(road_distance(parcel.access.point, &road.points) < 0.001);
+
+            for road in &map.roads {
+                let clearance = road.width * 0.5;
+                for segment in road.points.windows(2) {
+                    let [start, end] = [segment[0], segment[1]];
+                    if !nearby(&parcel.polygon, segment, clearance + 3.0)
+                        && !nearby(&driveway, segment, clearance + 2.0)
+                    {
+                        continue;
+                    }
+                    assert!(polygon_to_segment(&corners, [start, end]) >= clearance - 0.001);
+                    assert!(polygon_to_segment(&parcel.polygon, [start, end]) >= clearance - 0.001);
+                    let distance = segment_distance(driveway, [start, end]);
+                    if road.id != parcel.access.road_id {
                         assert!(
-                            road_distance(other.position, &driveway) >= other_radius + 3.0,
-                            "Seed {seed}: Gebäude {} blockiert die Zufahrt zu {}.",
-                            other.id,
-                            building.id
+                            distance >= clearance + RoadAccess::DRIVEWAY_WIDTH * 0.5 - 0.001,
+                            "Seed {seed}: Parzelle {} kreuzt die Straße {}.",
+                            parcel.id,
+                            road.id
                         );
+                    } else if road_distance(driveway[1], segment) > 0.001 {
+                        assert!(!crosses(&driveway, segment));
                     }
                 }
             }
 
-            for road in &map.roads {
-                assert!(
-                    road_distance(position, &road.points) >= radius + 10.0,
-                    "Seed {seed}: Gebäude {} ragt in den Straßenraum von {}.",
-                    building.id,
-                    road.id
-                );
+            for other in &map.parcels[index + 1..] {
+                let other_driveway = [other.buildable.front(), other.access.point];
+                if nearby(&parcel.polygon, &other.polygon, 0.0) {
+                    assert!(!rectangles_overlap(&parcel.polygon, &other.polygon));
+                }
+                for (line, against) in [
+                    (driveway, &other.polygon),
+                    (other_driveway, &parcel.polygon),
+                ] {
+                    if nearby(&line, against, RoadAccess::DRIVEWAY_WIDTH * 0.5) {
+                        assert!(
+                            polygon_to_segment(against, line)
+                                >= RoadAccess::DRIVEWAY_WIDTH * 0.5 - 0.001
+                        );
+                    }
+                }
             }
+        }
+        for block in &map.blocks {
+            assert!(
+                map.parcels
+                    .iter()
+                    .any(|parcel| parcel.block_id == block.id && parcel.building_id.is_none())
+            );
         }
     }
 }
@@ -299,6 +355,76 @@ fn road_distance(point: Point, road: &[Point]) -> f32 {
             )
         })
         .fold(f32::INFINITY, f32::min)
+}
+
+fn edges(polygon: &[Point]) -> impl Iterator<Item = [Point; 2]> + '_ {
+    (0..polygon.len()).map(|i| [polygon[i], polygon[(i + 1) % polygon.len()]])
+}
+
+fn within(polygon: &[Point], p: Point) -> bool {
+    let mut inside = false;
+    for [a, b] in edges(polygon) {
+        if (a.z > p.z) != (b.z > p.z) && p.x < a.x + (p.z - a.z) * (b.x - a.x) / (b.z - a.z) {
+            inside = !inside;
+        }
+    }
+    inside
+}
+
+fn nearby(a: &[Point], b: &[Point], tolerance: f32) -> bool {
+    let aabb = |v: &[Point], project: fn(Point) -> f32| {
+        v.iter()
+            .map(|&point| project(point))
+            .fold((f32::INFINITY, f32::NEG_INFINITY), |(lo, hi), x| {
+                (lo.min(x), hi.max(x))
+            })
+    };
+    [((|p: Point| p.x) as fn(Point) -> f32), |p: Point| p.z]
+        .into_iter()
+        .all(|axis| {
+            let (lo, hi) = aabb(a, axis);
+            let (lo2, hi2) = aabb(b, axis);
+            lo <= hi2 + tolerance && lo2 <= hi + tolerance
+        })
+}
+
+fn rectangles_overlap(a: &[Point], b: &[Point]) -> bool {
+    [a, b]
+        .into_iter()
+        .flat_map(|polygon| edges(polygon).take(2))
+        .all(|[x, y]| {
+            let projection = |polygon: &[Point]| {
+                let length = distance(x, y);
+                polygon
+                    .iter()
+                    .map(|p| ((y.z - x.z) * p.x - (y.x - x.x) * p.z) / length)
+                    .fold((f32::INFINITY, f32::NEG_INFINITY), |(lo, hi), k| {
+                        (lo.min(k), hi.max(k))
+                    })
+            };
+            let (lo, hi) = projection(a);
+            let (lo2, hi2) = projection(b);
+            hi.min(hi2) - lo.max(lo2) > 0.001
+        })
+}
+
+fn polygon_to_segment(polygon: &[Point], segment: [Point; 2]) -> f32 {
+    if segment.iter().any(|&p| within(polygon, p)) {
+        return 0.0;
+    }
+    edges(polygon)
+        .map(|edge| segment_distance(edge, segment))
+        .fold(f32::INFINITY, f32::min)
+}
+
+fn segment_distance(a: [Point; 2], b: [Point; 2]) -> f32 {
+    if crosses(&a, &b) {
+        return 0.0;
+    }
+    road_distance(a[0], &b)
+        .min(road_distance(a[1], &b))
+        .min(road_distance(b[0], &a))
+        .min(road_distance(b[1], &a))
 }
 
 fn crosses(a: &[Point], b: &[Point]) -> bool {
@@ -343,6 +469,27 @@ fn start_maps_expose_street_bounded_blocks() {
                     ));
                 }
             }
+        }
+    }
+}
+
+#[test]
+fn reserves_a_logistics_parcel_in_every_block() {
+    for seed in ["0", "1"] {
+        let game = Game::new(seed).unwrap();
+        let map = game.view();
+        for block in &map.blocks {
+            let parcel = map.parcels.iter().find(|parcel| {
+                parcel.block_id == block.id
+                    && parcel.building_id.is_none()
+                    && parcel.buildable.width >= 53.0
+                    && parcel.buildable.depth >= 36.0
+            });
+            assert!(
+                parcel.is_some(),
+                "Seed {seed}, Block {}: freier Logistikbauplatz fehlt.",
+                block.id
+            );
         }
     }
 }
