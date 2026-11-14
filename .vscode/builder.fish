@@ -27,16 +27,21 @@ function find_godot
     return 1
 end
 
+function run_cargo
+    set -lx PATH "$builder_rust_bin" $PATH
+    command cargo $argv
+end
+
 function build_debug
-    cargo build --locked -p builder-godot --target-dir target
+    run_cargo build --locked -p builder-godot --target-dir target
     and mkdir -p game/bin
     and cp target/debug/libbuilder_godot.dylib game/bin/
     and "$godot" --headless --path game --editor --import --quit
 end
 
 function export_macos
-    rustup target add aarch64-apple-darwin x86_64-apple-darwin
-    and cargo build --locked --release -p builder-godot --target-dir target \
+    rustup target add --toolchain "$builder_toolchain" aarch64-apple-darwin x86_64-apple-darwin
+    and run_cargo build --locked --release -p builder-godot --target-dir target \
         --target aarch64-apple-darwin --target x86_64-apple-darwin
     and mkdir -p game/bin dist
     and lipo -create target/aarch64-apple-darwin/release/libbuilder_godot.dylib \
@@ -45,6 +50,18 @@ function export_macos
     and "$godot" --headless --path game --editor --import --quit
     and "$godot" --headless --path game --export-release macOS "$PWD/dist/Symbol-Logistik.app"
 end
+
+if not command -sq rustup
+    echo 'Rustup fehlt im PATH. Die VS-Code-Tasks benötigen Rustup für die Projekt-Toolchain.' >&2
+    exit 1
+end
+
+set -l active_toolchain (rustup show active-toolchain)
+or exit 1
+set -g builder_toolchain (string split -f 1 ' ' -- "$active_toolchain")
+set -l cargo_path (rustup which --toolchain "$builder_toolchain" cargo)
+or exit 1
+set -g builder_rust_bin (path dirname -- "$cargo_path")
 
 set -g godot (find_godot)
 or exit 1
@@ -56,10 +73,10 @@ switch "$argv[1]"
         build_debug
         and "$godot" --path game
     case check
-        cargo fmt --check
-        and cargo clippy --locked --workspace --all-targets -- -D warnings
-        and cargo test --locked --workspace
-        and cargo build --locked -p builder-core --target wasm32-unknown-unknown
+        run_cargo fmt --check
+        and run_cargo clippy --locked --workspace --all-targets -- -D warnings
+        and run_cargo test --locked --workspace
+        and run_cargo build --locked -p builder-core --target wasm32-unknown-unknown
         and build_debug
         and "$godot" --headless --path game --script "$PWD/tests/start_menu.gd"
     case export
