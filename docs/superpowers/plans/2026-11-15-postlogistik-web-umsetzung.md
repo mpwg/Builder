@@ -29,11 +29,13 @@
 
 ## Meilenstein 1 · Erste Zustellung im Browser
 
-- [ ] Projektgerüst und Prüfbefehle einrichten. Vite mit relativen Asset-URLs konfigurieren. Den Produktionsbuild unter einem Pfad unterhalb der Domainwurzel laden und alle Laufzeitanfragen auf denselben Ursprung prüfen.
-- [ ] In `src/core/map.ts` einen zusammenhängenden Graphen mit Zentrum, vier aktiven Gebieten und Depotstandorten aus einem Seed erzeugen. Kanten bestimmen Fahrzeiten. Test `sameSeedRepeatsAndEveryDistrictIsReachable` prüft Reproduzierbarkeit, Variation und Erreichbarkeit bei mindestens 100 Seeds.
-- [ ] In `src/core/dispatch.ts` Werbung und Briefe vom Zentrum per Fahrrad automatisch zustellen. Chargen reservieren, sichtbar transportieren und nach Bedienzeit im Gebiet zustellen. Fahrzeug zum Zentrum zurückführen. Test `deliveryAndRevenueAreBookedOnce` prüft Menge, Rückkehr und genau eine Erlösbuchung.
-- [ ] Startmenü, Seedfeld, Einstiegshilfe, Gebietsliste und SVG-Karte anbinden. Pro Animationsframe höchstens acht Schritte zulassen. `hiddenTabDoesNotCatchUp` prüft unveränderten Tick während ausgeblendeter Seite, Wiederaufnahme ohne Nachholschritte und fortbestehende manuelle Pause. Bei gleicher Tickzahl liefern alle Tempi dasselbe Simulationsergebnis.
-- [ ] Im Browser mit zwei Seeds jeweils eine Briefzustellung vom Eingang bis zur Buchung beobachten. Paket prüfen und committen.
+- [x] Projektgerüst und Prüfbefehle einrichten. Vite mit relativen Asset-URLs konfigurieren. Den Produktionsbuild unter einem Pfad unterhalb der Domainwurzel laden und alle Laufzeitanfragen auf denselben Ursprung prüfen.
+- [x] In `src/core/map.ts` einen zusammenhängenden Graphen mit Zentrum, vier aktiven Gebieten und Depotstandorten aus einem Seed erzeugen. Kanten bestimmen Fahrzeiten. Test `sameSeedRepeatsAndEveryDistrictIsReachable` prüft Reproduzierbarkeit, Variation und Erreichbarkeit bei mindestens 100 Seeds.
+- [x] In `src/core/dispatch.ts` Werbung und Briefe vom Zentrum per Fahrrad automatisch zustellen. Chargen reservieren, sichtbar transportieren und nach Bedienzeit im Gebiet zustellen. Fahrzeug zum Zentrum zurückführen. Test `deliveryAndRevenueAreBookedOnce` prüft Menge, Rückkehr und genau eine Erlösbuchung.
+- [x] Startmenü, Seedfeld, Einstiegshilfe, Gebietsliste und SVG-Karte anbinden. Pro Animationsframe höchstens acht Schritte zulassen. `hiddenTabDoesNotCatchUp` prüft unveränderten Tick während ausgeblendeter Seite, Wiederaufnahme ohne Nachholschritte und fortbestehende manuelle Pause. Bei gleicher Tickzahl liefern alle Tempi dasselbe Simulationsergebnis.
+- [x] Im Browser mit zwei Seeds jeweils eine Briefzustellung vom Eingang bis zur Buchung beobachten. Paket prüfen und committen.
+
+Abnahme: Typprüfung, acht Core- und Taktgeber-Tests sowie drei Playwright-Tests bestanden. Chromium lud den Produktionsbuild unter `/post/` und schloss für `Nordring` und `Westpost` je eine Briefzustellung ab. Der Sichtbarkeitstest löste Browserereignisse kontrolliert aus. Die Kartenansicht wurde zusätzlich bei 1280 × 720 geprüft.
 
 ## Meilenstein 2 · Vollständige Disposition und manuelle Eingriffe
 

@@ -1,0 +1,21 @@
+{
+  "name": "symbol-logistik",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "check": "tsc --noEmit",
+    "test": "vitest run tests/core tests/browser/clock.test.ts",
+    "test:e2e": "bun run build && playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26",
+    "typescript": "7.0.2",
+    "vite": "8.3.8",
+    "vitest": "5.1.0"
+  }
+}

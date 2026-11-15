@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f0e4">
+  <title>Symbol-Logistik</title>
+  <link rel="stylesheet" href="/src/ui/styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="brand"><svg width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><path d="M2 3h26v18H2zM2 4l13 10L28 4" fill="none" stroke="currentColor" stroke-width="2"/></svg> Symbol-Logistik</div>
+    <button id="menu-button" type="button" hidden>Hauptmenü</button>
+  </header>
+  <main>
+    <section id="menu" class="cover">
+      <div class="cover-copy">
+        <h1>Die Post<br>ist unterwegs<span>.</span></h1>
+        <p>Vom Postzentrum in vier Zustellgebiete. Begleite die erste Fahrradtour auf deiner eigenen Netzkarte.</p>
+        <button class="primary" id="new-game" type="button">Neue Partie <span aria-hidden="true">↗</span></button>
+        <form id="seed-form" hidden>
+          <label for="seed-input">Karten-Seed</label>
+          <div class="seed-row"><input id="seed-input" name="seed" required maxlength="64" autocomplete="off" aria-describedby="seed-hint"><button class="primary" type="submit">Starten</button></div>
+          <small id="seed-hint">Derselbe Seed erzeugt dieselbe Karte.</small>
+          <p id="seed-error" role="alert" hidden></p>
+        </form>
+      </div>
+      <div class="cover-art" aria-hidden="true">
+        <svg viewBox="0 0 500 400">
+          <path d="M56 96h92l100 105h152M110 299h45l93-98 109-107h75M248 201v139" fill="none" stroke="#f4eada" stroke-width="4"/>
+          <path d="M248 201h152" stroke="#efb643" stroke-width="5" stroke-dasharray="7 8"/>
+          <g fill="#efb643"><circle cx="56" cy="96" r="10"/><circle cx="110" cy="299" r="10"/><circle cx="432" cy="94" r="10"/><circle cx="400" cy="201" r="10"/><circle cx="248" cy="340" r="6"/></g>
+          <rect x="196" y="158" width="104" height="86" rx="8" fill="#f4eada"/>
+          <path d="M214 179h68v44h-68zM215 180l33 26 33-26" fill="none" stroke="#173f38" stroke-width="4" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </section>
+    <section id="game" hidden>
+      <header class="game-head">
+        <div><p class="eyebrow">Postnetz <span id="seed" data-testid="seed"></span></p><h1 id="map-heading" tabindex="-1">Zustellkarte</h1></div>
+        <div class="controls" aria-label="Zeitsteuerung" role="group">
+          <output id="clock" data-testid="clock" aria-label="Simulationszeit" aria-live="off">00:00</output>
+          <button id="pause" type="button">Pause</button>
+          <div class="speeds" role="group" aria-label="Spieltempo">
+            <button type="button" data-speed="1" aria-pressed="true">1×</button><button type="button" data-speed="2" aria-pressed="false">2×</button><button type="button" data-speed="4" aria-pressed="false">4×</button>
+          </div>
+        </div>
+      </header>
+      <p id="pause-note" hidden>Simulation pausiert.</p>
+      <div class="board">
+        <section class="map-panel" aria-label="Netzkarte">
+          <div class="map-tools" role="group" aria-label="Kartenausschnitt">
+            <button type="button" id="zoom-in" aria-label="Vergrößern">+</button>
+            <button type="button" id="zoom-out" aria-label="Verkleinern">−</button>
+            <button type="button" id="reset-map">Übersicht</button>
+          </div>
+          <div class="map-scroll" id="map-scroll" tabindex="0" role="region" aria-label="Verschiebbarer Kartenausschnitt"><svg id="network" viewBox="0 0 100 100" role="img" aria-label="Schematische Karte mit Postzentrum, Depots und vier Zustellgebieten"></svg></div>
+          <div class="legend"><span class="legend-center">Postzentrum</span><span class="legend-depot">Depotstandort</span><span class="legend-road">Verbindung</span></div>
+        </section>
+        <aside class="dispatch" aria-label="Postbetrieb">
+          <section class="summary">
+            <div><span>Briefe zugestellt</span><strong data-testid="letters-delivered" id="letters">0</strong></div>
+            <div><span>Einnahmen</span><strong data-testid="revenue" id="revenue">0,00 €</strong></div>
+          </section>
+          <section class="current">
+            <p class="eyebrow">Fahrrad</p><h2 id="phase">Bereit</h2>
+            <p id="cargo"></p>
+            <p data-testid="event" id="event" aria-live="polite"></p>
+          </section>
+          <section class="areas">
+            <h2>Zustellgebiete</h2>
+            <ul id="districts" aria-label="Zustellgebiete"></ul>
+            <p id="details"></p>
+          </section>
+        </aside>
+      </div>
+      <details id="guide" open><summary>Einstiegshilfe</summary><p>Warte auf den ersten Briefeingang. Sobald das Fahrrad beladen ist, zeigt die Karte die Fahrt zum Ziel. Dort wird der Brief zugestellt und anschließend fährt das Fahrrad zum Zentrum zurück. Die Gebietsliste zeigt Rückstand und zugestellte Sendungen.</p></details>
+    </section>
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

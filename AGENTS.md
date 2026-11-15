@@ -9,6 +9,7 @@ Der [Spielentwurf](docs/superpowers/specs/2026-11-15-postlogistik-design.md) def
 ## Arbeitsweise
 
 - Verwende deutsche Umlaute.
+- Prüfe vor Eigenentwicklungen für einzelne Komponenten zuerst native Browserbausteine und geeignete fertige Komponenten oder Bibliotheken. Wähle nach Funktionsumfang, Zugänglichkeit und Aufwand für Integration und Pflege.
 - Prüfe Spielregeln unabhängig vom DOM mit reproduzierbaren Seeds und festen Simulationsschritten. Prüfe sichtbare Abläufe im gebauten Spiel im tatsächlichen Browser. Weise automatisierte und praktische Browserprüfungen getrennt aus.
 - Nutze für HTML, CSS und clientseitiges TypeScript zuerst Modern Web Guidance. Führe alle Aufrufe mit `bunx --bun modern-web-guidance@latest` aus. Nutze für die Skills-CLI `bunx --bun skills` und installiere oder aktualisiere deren Skills direkt darüber.
 - Lies vor dem Schreiben oder Ändern von Shellskripten `~/.agents/skills/personal-shell-scripts/SKILL.md`.
