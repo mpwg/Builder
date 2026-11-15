@@ -1,0 +1,170 @@
+.postal-map {
+  --map-ink: #372719;
+  --map-cream: #fff4d8;
+  --map-road-blue: #155db5;
+  --map-road-green: #087e65;
+  --map-road-orange: #ba4716;
+  isolation: isolate;
+}
+
+.postal-map :is(.map-scenery, .map-roads, .map-road, .map-directions),
+.postal-map-cover {
+  pointer-events: none;
+}
+
+.map-paper { fill: #e8ca97; }
+.map-pasture { fill: #dfd297; }
+.scenery-contours { fill: none; stroke: #9c783b; stroke-width: .25; opacity: .28; }
+.scenery-grain-dark, .scenery-grain-light { fill: none; stroke-width: .22; stroke-linecap: round; }
+.scenery-grain-dark { stroke: #705a29; opacity: .27; }
+.scenery-grain-light { stroke: #fff8d7; opacity: .66; }
+
+.postal-map .district-shape {
+  stroke: #fbefcc;
+  stroke-width: 1.15;
+  stroke-linejoin: round;
+  cursor: pointer;
+}
+.district-orchard { fill: #b9c47d; }
+.district-meadow { fill: #aebf78; }
+.district-field { fill: #ccd08c; }
+.district-harbor { fill: #d9ae83; }
+.postal-map .district-shape.selected {
+  fill: #e6a472;
+  stroke: #fff2d2;
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+}
+
+.map-water {
+  fill: #55aab8;
+  stroke: #fff0cf;
+  stroke-width: 1.15;
+  stroke-linejoin: round;
+}
+.map-shore { fill: #3996ac; }
+.water-ripple {
+  fill: none;
+  stroke: #fff2ce;
+  stroke-width: .35;
+  stroke-linecap: round;
+  opacity: .9;
+}
+
+.scenery-tall-tree { --tree-leaf: #6d8944; --tree-light: #a9ae65; }
+.scenery-small-tree { --tree-leaf: #83994d; --tree-light: #a8b873; }
+.scenery-tree { fill: var(--tree-leaf, #83994d); stroke: #7b8e47; stroke-width: .18; }
+.scenery-tree-light { fill: var(--tree-light, #a8b873); opacity: .66; }
+.scenery-branches {
+  fill: none;
+  stroke: #505433;
+  stroke-width: .36;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.scenery-brick-roof { --roof: #a95e37; --roof-light: #d88f59; }
+.scenery-clay-roof { --roof: #b37342; --roof-light: #d7985e; }
+.scenery-wall { fill: #f3d499; }
+.scenery-wall-shade { fill: #e7b976; }
+.scenery-roof { fill: var(--roof, #a95e37); }
+.scenery-roof-light { fill: var(--roof-light, #d88f59); }
+.scenery-window { fill: #8e6943; }
+.scenery-wharf { fill: #74513b; }
+.scenery-crane {
+  fill: none;
+  stroke: #654532;
+  stroke-width: .53;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.scenery-containers { fill: #b16642; stroke: #885233; stroke-width: .32; }
+.scenery-container-lines { fill: none; stroke: #edaa6f; stroke-width: .32; }
+.scenery-boat { fill: #f8deae; stroke: #524733; stroke-width: .6; stroke-linejoin: round; }
+
+.postal-map :is(.road, .road-casing, .road-bridge) {
+  stroke-linecap: round;
+}
+.postal-map .road { stroke: var(--map-road-blue); stroke-width: 1.8; }
+.postal-map .map-road-local .road { stroke: var(--map-road-green); }
+.postal-map .road-casing { stroke: var(--map-cream); stroke-width: 3.4; }
+.postal-map .road-bridge { stroke: #95623b; stroke-width: 3.7; }
+.postal-map .map-road-selected .road { stroke: var(--map-road-orange); stroke-width: 2.7; }
+.postal-map .map-road-selected .road-casing { stroke-width: 4.3; }
+.postal-map .map-road-selected .road-bridge { stroke-width: 4.7; }
+.road-direction {
+  fill: none;
+  stroke: var(--map-cream);
+  stroke-width: .43;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.postal-map :is(.map-node, .vehicle) { cursor: pointer; }
+.postal-map-cover :is(.district-shape, .vehicle) { cursor: inherit; }
+.postal-map :is(.center-pin, .depot-pin) {
+  stroke: var(--map-ink);
+  stroke-width: .7;
+  stroke-linejoin: round;
+}
+.center-pin { fill: #fac246; }
+.center-wings { fill: #e6a126; }
+.building-openings { fill: var(--map-ink); }
+.center-outline, .center-seams, .posthorn, .postal-map .envelope-fold {
+  fill: none;
+  stroke: var(--map-ink);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.center-outline { stroke: var(--map-cream); stroke-width: 2.15; }
+.center-seams { stroke-width: .6; }
+.posthorn { stroke-width: .65; }
+.postal-map .envelope-fold { stroke-width: .49; }
+.depot-pin { fill: #f5c355; }
+.postal-map .depot-node.closed .depot-pin { fill: #f3deb2; }
+.postal-map .depot-node.closing .depot-pin { fill: #eeac75; }
+.depot-outline {
+  fill: none;
+  stroke: var(--map-cream);
+  stroke-width: 1.85;
+  stroke-linejoin: round;
+}
+.depot-status-disc { fill: #336345; stroke: var(--map-cream); stroke-width: .35; }
+.depot-node.closing .depot-status-disc { fill: #9e410f; }
+.depot-node.closed .depot-status { display: none; }
+.depot-status-mark { fill: none; stroke: var(--map-cream); stroke-width: .45; stroke-linecap: round; }
+
+.postal-map .district-pin {
+  fill: #fff9e4;
+  stroke: var(--map-road-blue);
+  stroke-width: 1.05;
+}
+.postal-map .selected .district-pin { stroke: var(--map-road-orange); }
+.map-label-paper { fill: #fcf0d1; stroke: #ab854e; stroke-width: .25; }
+.map-center-node .map-label-paper { stroke: var(--map-ink); stroke-width: .65; }
+.selected .map-label-paper { fill: #ffd87d; stroke: #9c4013; stroke-width: .45; }
+.postal-map .map-label {
+  fill: var(--map-ink);
+  text-anchor: middle;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 4.15px;
+  stroke: none;
+  pointer-events: none;
+}
+.map-center-node .map-label { font-size: 4.35px; }
+
+.postal-map .vehicle-disc {
+  fill: #ffdb65;
+  stroke: var(--map-ink);
+  stroke-width: .7;
+}
+.postal-map .bike-glyph {
+  fill: none;
+  stroke: var(--map-ink);
+  stroke-width: .48;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.postal-map .vehicle.parked { opacity: .94; }
+.postal-map .vehicle.selected { opacity: 1; }
+.postal-map .vehicle.selected .vehicle-disc { stroke-width: 1.1; fill: #fff4d3; }

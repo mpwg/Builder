@@ -1,12 +1,12 @@
-# Symbol-Logistik
+# Ab die Post
 
-Symbol-Logistik ist ein Browser-Spiel über den Betrieb eines Postnetzes. Eingehende Sendungen gelangen vom zentralen Postzentrum direkt oder über Depots in ganze Zustellgebiete. Werbung, Briefe, Einschreiben, kleine Pakete und Speditionsware stellen unterschiedliche Anforderungen an Kapazität, Transportmittel und Zustellzeit.
+Ab die Post ist ein Browser-Spiel über den Betrieb eines Postnetzes. Eingehende Sendungen gelangen vom zentralen Postzentrum direkt oder über Depots in ganze Zustellgebiete. Werbung, Briefe, Einschreiben, kleine Pakete und Speditionsware stellen unterschiedliche Anforderungen an Kapazität, Transportmittel und Zustellzeit.
 
-Die Tourenplanung läuft automatisch. Du kannst Flotte, Gebietszuständigkeiten, Prioritäten und Tourvorlagen anpassen. Auf einer symbolischen 2D-Karte beobachtest du den Betrieb in Echtzeit und kannst jederzeit pausieren. Kosten, Pünktlichkeit und Zufriedenheit zeigen die Folgen deiner Entscheidungen. Ein festgefahrener Betrieb lässt sich jederzeit sanieren.
+Die Tourenplanung läuft automatisch. Du kannst Flotte, Gebietszuständigkeiten, Prioritäten und Tourvorlagen anpassen. Auf einer illustrierten 2D-Karte beobachtest du den Betrieb in Echtzeit und kannst jederzeit pausieren. Die Betriebsübersicht zeigt, wie viele Sendungen du zugestellt hast und was dein Netz kostet.
 
 Meilenstein 2 ist spielbar. Fahrrad, Lastenrad, Lieferwagen und Lkw verteilen alle fünf Sendungsarten. In der Gebietsliste siehst du offene, überfällige und zugestellte Mengen. Die Betriebsanzeige trennt Einnahmen, Investitionen und Betriebskosten.
 
-Für den ersten Depotumschlag unter **Depots** einen Standort eröffnen. In der Gebietsliste ein Gebiet auswählen und über **Gebiet bearbeiten** dem neuen Depot zuordnen. Anschließend unter **Flotte** ein passendes Fahrzeug zum Depot verlegen oder dort kaufen. Sendungen kommen per Transfer aus dem Postzentrum. Für Speditionsware braucht auch das zustellende Depot einen Lkw.
+Für den ersten Depotumschlag unter **Depots** einen Standort eröffnen. Unter **Gebiete** das gewünschte Gebiet auswählen und dem neuen Depot zuordnen. Anschließend unter **Flotte** ein passendes Fahrzeug zum Depot verlegen oder dort kaufen. Sendungen kommen per Transfer aus dem Postzentrum. Für Speditionsware braucht auch das zustellende Depot einen Lkw.
 
 Unter **Touren** lassen sich Halte für das unter **Flotte** ausgewählte Fahrzeug hinzufügen, umsortieren und als verbindliche Tourvorlage speichern. **Automatik übernehmen lassen** gibt das Fahrzeug für die automatische Planung frei. Eine laufende Tour behält ihre Halte.
 
@@ -19,7 +19,7 @@ bun install --frozen-lockfile
 bun run dev
 ```
 
-Die ausgegebene Adresse im Browser öffnen und **Neue Partie → Starten** wählen. Mit den Seeds `Nordring` und `Westpost` lassen sich zwei unterschiedliche Zustellläufe reproduzieren.
+Die ausgegebene Adresse im Browser öffnen und **Neue Partie → Starten** wählen. Die Leiste am unteren Rand öffnet alle Betriebsbereiche im selben Fenster. Mit den Seeds `Nordring` und `Westpost` lassen sich zwei unterschiedliche Zustellläufe reproduzieren.
 
 `bun run build` erzeugt `dist/` zur statischen Auslieferung. Der Build funktioniert auch unter einem URL-Unterpfad. Die Simulation läuft vollständig im Browser.
 

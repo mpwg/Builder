@@ -50,7 +50,12 @@ function row(kind: ShipmentKind, label: string, parent: Element, marker?: Record
   };
 }
 
-export function createWorkbench(send: Send, onDistrict: (id: string) => void, onVehicle: () => void) {
+export function createWorkbench(
+  send: Send,
+  onDistrict: (id: string) => void,
+  onDepot: (id: string) => void,
+  onVehicle: () => void,
+) {
   let view: GameView;
   let districtId = '';
   let areaSignature = '';
@@ -68,6 +73,11 @@ export function createWorkbench(send: Send, onDistrict: (id: string) => void, on
   const close = byId<HTMLButtonElement>('close-depot');
   const release = byId<HTMLButtonElement>('clear-template');
   const depotStat = byId('depot-status');
+  const depotMode = byId('depot-mode');
+  const depotStock = byId('depot-stock');
+  const depotBays = byId('depot-bays');
+  const depotFleet = byId('depot-fleet');
+  const depotDistricts = byId('depot-districts');
   const problemItems = new Map<string, HTMLLIElement>();
   const report = (id: string) => byId(id).querySelector<HTMLElement>('.feedback')!;
 
@@ -143,7 +153,12 @@ export function createWorkbench(send: Send, onDistrict: (id: string) => void, on
     const routed = view.districts.filter(area => area.depotId === depot.id).map(area => name(area.id));
     const vehicles = view.vehicles.filter(vehicle => vehicle.homeId === depot.id).length;
     const capacity = depot.capacity === null ? 'unbegrenzt' : depot.capacity;
-    setText(depotStat, `${mode} · Lager: ${depot.used} belegt + ${depot.reserved} reserviert / ${capacity} · Ladeplätze: ${depot.busyBays}/${depot.loadingBays} · Flotte: ${vehicles} · Gebiete: ${routed.join(', ') || 'keine'}`);
+    setText(depotMode, mode);
+    setText(depotStock, `${depot.used} belegt + ${depot.reserved} reserviert / ${capacity}`);
+    setText(depotBays, `${depot.busyBays} / ${depot.loadingBays}`);
+    setText(depotFleet, String(vehicles));
+    setText(depotDistricts, routed.join(', ') || 'Keine');
+    depotStat.toggleAttribute('data-open', depot.open && !depot.closing);
     depotStat.dataset.used = String(depot.used);
     depotStat.dataset.reserved = String(depot.reserved);
     open.hidden = depot.id === 'center' || depot.open || depot.closing;
@@ -152,6 +167,7 @@ export function createWorkbench(send: Send, onDistrict: (id: string) => void, on
     closure.hidden = close.hidden;
     setText(closure, 'Räumung: Gebiete wechseln zum Postzentrum. Laufende Touren enden regulär. Räumungsfahrten bringen Restbestände zurück, auch wenn ein Fahrzeug eine Tourvorlage hat.');
     byId<HTMLFormElement>('bundle-form').hidden = !depot.open || depot.closing;
+    byId('depot-wait-closed').hidden = depot.open && !depot.closing;
     setText(open, `Depot eröffnen · ${money(DEPOT_OPEN_COST)}`);
     const signature = `${depot.id}:${depot.bundleWaitTicks}`;
     if (signature !== depotSignature) {
@@ -217,10 +233,8 @@ export function createWorkbench(send: Send, onDistrict: (id: string) => void, on
       button.addEventListener('click', () => {
         if (view.districts.some(area => area.id === problem.nodeId)) {
           onDistrict(problem.nodeId);
-          byId('district-work').focus();
         } else if (view.depots.some(depot => depot.id === problem.nodeId)) {
-          selectDepot(problem.nodeId);
-          byId('depot-work').focus();
+          onDepot(problem.nodeId);
         }
       });
       item.append(button);

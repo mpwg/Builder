@@ -7,7 +7,10 @@ test('opens a depot, serves all shipment kinds and returns a manual tour to auto
   await page.getByLabel('Karten-Seed').fill('Nordring');
   await page.getByRole('button', { name: 'Starten' }).click();
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  const nav = page.getByRole('navigation', { name: 'Betriebsbereiche' });
+  const openView = (name: string) => nav.getByRole('button', { name, exact: true }).click();
 
+  await openView('Depots');
   await page.getByRole('combobox', { name: 'Depotstandort', exact: true }).selectOption('depot-1');
   await page.getByRole('button', { name: /^Depot eröffnen/ }).click();
   await expect(page.getByTestId('depot-status')).toContainText('Geöffnet');
@@ -18,6 +21,7 @@ test('opens a depot, serves all shipment kinds and returns a manual tour to auto
   await page.getByRole('combobox', { name: 'Depotstandort', exact: true }).selectOption('depot-1');
   await expect(bundle).toHaveValue('1.5');
 
+  await openView('Gebiete');
   const areas = page.getByRole('list', { name: 'Zustellgebiete' });
   for (const area of ['Lindenau', 'Am Mühlbach']) {
     await areas.getByRole('button', { name: new RegExp(area) }).click();
@@ -28,11 +32,14 @@ test('opens a depot, serves all shipment kinds and returns a manual tour to auto
   await page.getByRole('button', { name: 'Vorrang übernehmen' }).click();
   await expect(page.getByRole('combobox', { name: 'Gebietsvorrang', exact: true })).toHaveValue('2');
 
+  await openView('Flotte');
+  await page.getByRole('button', { name: 'Kaufen', exact: true }).click();
   await page.getByRole('combobox', { name: 'Fahrzeugtyp kaufen', exact: true }).selectOption('van');
   await page.getByRole('button', { name: /^Fahrzeug kaufen/ }).click();
   const fleet = page.getByRole('combobox', { name: 'Fahrzeug auswählen', exact: true });
   const newVan = await fleet.inputValue();
   await expect(fleet.locator('option:checked')).toContainText('Lieferwagen');
+  await page.getByRole('button', { name: 'Verlegen', exact: true }).click();
   await page.getByRole('combobox', { name: 'Neues Heimatdepot', exact: true }).selectOption('depot-1');
   await page.getByRole('button', { name: 'Fahrzeug verlegen' }).click();
 
@@ -40,9 +47,11 @@ test('opens a depot, serves all shipment kinds and returns a manual tour to auto
   await page.getByRole('button', { name: 'Fortsetzen', exact: true }).click();
   await page.clock.runFor(3500);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  await page.getByRole('button', { name: 'Fahrzeug', exact: true }).click();
   await fleet.selectOption(newVan);
   await expect(page.getByTestId('vehicle-status')).toContainText('Depotstandort Nord');
 
+  await openView('Touren');
   for (const id of ['district-1', 'district-2']) {
     await page.getByRole('combobox', { name: 'Gebiet für Tourvorlage', exact: true }).selectOption(id);
     await page.getByRole('button', { name: 'Gebiet hinzufügen' }).click();
@@ -83,9 +92,11 @@ test('opens a depot, serves all shipment kinds and returns a manual tour to auto
     await expect(page.locator(`[data-delivered-kind="${kind}"]`)).not.toHaveAttribute('data-count', '0');
   }
 
+  await openView('Depots');
   await page.getByRole('button', { name: 'Depot räumen', exact: true }).click();
   await expect(page.getByTestId('depot-status')).toContainText(/Räumung|Geschlossen/);
   await page.clock.runFor(18000);
   await expect(page.getByTestId('depot-status')).toContainText('Geschlossen');
+  await openView('Gebiete');
   await expect(page.getByRole('combobox', { name: 'Zuständiges Depot', exact: true })).toHaveValue('center');
 });

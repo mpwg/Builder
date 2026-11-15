@@ -1,6 +1,6 @@
 import { createClock } from './browser/clock';
 import { applyCommand, createGame, readView, step } from './core/game';
-import { drawMap } from './ui/map';
+import { drawCoverMap, drawMap } from './ui/map';
 
 import type { Command } from './core/model';
 import { byId, money, setText } from './ui/dom';
@@ -8,6 +8,12 @@ import { createWorkbench } from './ui/workbench';
 
 const menu = byId('menu');
 const game = byId('game');
+const board = byId('board');
+const panels = document.querySelectorAll<HTMLElement>('[data-view]');
+const viewButtons = document.querySelectorAll<HTMLButtonElement>('[data-open-view]');
+const fleetButtons = document.querySelectorAll<HTMLButtonElement>('[data-fleet-view]');
+const compactButtons = document.querySelectorAll<HTMLButtonElement>('button[data-compact-view]');
+const localViews = document.querySelectorAll<HTMLElement>('[data-local-active]');
 const form = byId<HTMLFormElement>('seed-form');
 const seed = byId<HTMLInputElement>('seed-input');
 const newGame = byId<HTMLButtonElement>('new-game');
@@ -38,7 +44,47 @@ const clock = createClock(() => {
   view = readView(state);
 });
 
-const workbench = createWorkbench(send, selectDistrict, () => paint(1));
+const workbench = createWorkbench(send, id => {
+  selectDistrict(id);
+  openView('gebiete', 'district-work');
+}, openDepot, () => paint(1));
+
+function openView(name: string, heading?: string) {
+  board.dataset.activeView = name;
+  for (const panel of panels) panel.hidden = panel.dataset.view !== name;
+  for (const button of viewButtons) {
+    if (button.dataset.openView === name) button.setAttribute('aria-current', 'true');
+    else button.removeAttribute('aria-current');
+  }
+  if (heading) byId(heading).focus({ preventScroll: true });
+}
+
+function openFleetView(name: string) {
+  for (const button of fleetButtons) {
+    const active = button.dataset.fleetView === name;
+    button.setAttribute('aria-pressed', String(active));
+    byId(button.getAttribute('aria-controls')!).hidden = !active;
+  }
+}
+
+function openCompactView(name: string) {
+  board.dataset.compactView = name;
+  for (const button of compactButtons) {
+    button.setAttribute('aria-pressed', String(button.dataset.compactView === name));
+  }
+}
+
+function openLocalView(panel: HTMLElement, name: string) {
+  panel.dataset.localActive = name;
+  for (const button of panel.querySelectorAll<HTMLButtonElement>('[data-local-view]')) {
+    button.setAttribute('aria-pressed', String(button.dataset.localView === name));
+  }
+}
+
+function openDepot(id: string) {
+  workbench.selectDepot(id);
+  openView('depots', 'depot-work');
+}
 
 function send(command: Command) {
   if (!state) return 'Starte zuerst eine Partie.';
@@ -73,11 +119,12 @@ function renderDistricts() {
   for (const area of view.districts) {
     const button = areaButtons.get(area.id)!;
     const count = area.waiting.reduce((total, item) => total + item.quantity, 0);
-    setText(button.lastElementChild!, String(count));
+    setText(button.lastElementChild!, `${count} offen`);
     button.setAttribute('aria-pressed', String(selected === area.id));
   }
   const area = view.districts.find(area => area.id === selected);
   if (!area) return;
+  map.select(area.id, area.depotId);
   const total = area.waiting.reduce((n, item) => n + item.quantity, 0);
   const overdue = area.waiting.reduce((n, item) => n + item.overdue, 0);
   const delivered = area.delivered.reduce((n, item) => n + item.quantity, 0);
@@ -86,7 +133,6 @@ function renderDistricts() {
 
 function selectDistrict(id: string) {
   selected = id;
-  map.select(id);
   renderDistricts();
   workbench.selectArea(id);
 }
@@ -105,6 +151,7 @@ function setPaused(value: boolean) {
   paused = value;
   clock.setPaused(value);
   pause.textContent = value ? 'Fortsetzen' : 'Pause';
+  pause.toggleAttribute('data-paused', value);
   byId('pause-note').hidden = !value;
   synchronizeFrames();
   if (value) render();
@@ -127,6 +174,12 @@ function start(value: string) {
   previous = view = readView(state);
   commandId = 0;
   workbench.reset();
+  openView('betrieb');
+  openFleetView('vehicle');
+  openCompactView('karte');
+  openLocalView(byId('view-gebiete'), 'sendungen');
+  openLocalView(byId('view-depots'), 'bestand');
+  openLocalView(byId('view-touren'), 'vorlage');
   byId('seed').textContent = view.seed;
   areaButtons.clear();
   districts.replaceChildren();
@@ -135,7 +188,8 @@ function start(value: string) {
     button.type = 'button';
     const key = document.createElement('span');
     key.className = 'area-key';
-    key.textContent = String(i + 1).padStart(2, '0');
+    key.setAttribute('aria-hidden', 'true');
+    key.dataset.area = String(i + 1);
     const name = document.createElement('span');
     name.textContent = view.map.nodes.find(node => node.id === area.id)!.name;
     const total = document.createElement('span');
@@ -147,19 +201,18 @@ function start(value: string) {
     districts.append(item);
     areaButtons.set(area.id, button);
   });
-  map = drawMap(mapSvg, view.map, selectDistrict, id => {
-    workbench.selectDepot(id);
-    byId('depot-work').focus();
-  }, id => {
+  map = drawMap(mapSvg, view.map, id => {
+    selectDistrict(id);
+    openView('gebiete', 'district-work');
+  }, openDepot, id => {
     workbench.selectVehicle(id);
-    byId('fleet-work').focus();
+    openFleetView('vehicle');
+    openView('flotte', 'fleet-work');
   });
   workbench.update(view);
   selectDistrict(view.districts[0].id);
   menu.hidden = true;
   game.hidden = false;
-  menuButton.hidden = false;
-  byId<HTMLDetailsElement>('guide').open = true;
   setZoom(1);
   speeds[0].click();
   clock.setHidden(document.hidden);
@@ -191,12 +244,41 @@ menuButton.addEventListener('click', () => {
   state = undefined;
   synchronizeFrames();
   game.hidden = true;
-  menuButton.hidden = true;
   menu.hidden = false;
   form.hidden = true;
   newGame.hidden = false;
   newGame.focus();
 });
+for (const button of viewButtons) {
+  button.addEventListener('click', () => {
+    const viewName = button.dataset.openView!;
+    openView(viewName);
+    let destination = byId(button.getAttribute('aria-controls')!);
+    if (viewName === 'betrieb') {
+      const compactControl = [...compactButtons].find(control =>
+        control.getAttribute('aria-pressed') === 'true' && control.getClientRects().length > 0,
+      );
+      destination = compactControl ?? byId('map-heading');
+    }
+    destination.focus({ preventScroll: true });
+  });
+}
+for (const button of fleetButtons) {
+  button.addEventListener('click', () => openFleetView(button.dataset.fleetView!));
+}
+for (const button of compactButtons) {
+  button.addEventListener('click', () => openCompactView(button.dataset.compactView!));
+}
+for (const panel of localViews) {
+  for (const button of panel.querySelectorAll<HTMLButtonElement>('[data-local-view]')) {
+    button.addEventListener('click', () => openLocalView(panel, button.dataset.localView!));
+  }
+}
+byId('choose-tour-vehicle').addEventListener('click', () => {
+  openFleetView('vehicle');
+  openView('flotte', 'vehicle-choice');
+});
+byId('open-guide').addEventListener('click', () => byId<HTMLDialogElement>('guide').showModal());
 pause.addEventListener('click', () => setPaused(!paused));
 for (const button of speeds) {
   button.addEventListener('click', () => {
@@ -211,3 +293,5 @@ document.addEventListener('visibilitychange', () => {
   clock.setHidden(document.hidden);
   synchronizeFrames();
 });
+
+drawCoverMap(byId<SVGSVGElement>('cover-network'));

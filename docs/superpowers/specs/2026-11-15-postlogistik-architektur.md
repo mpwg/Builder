@@ -1,4 +1,4 @@
-# Symbol-Logistik · Browserarchitektur
+# Ab die Post · Browserarchitektur
 
 Die [Spielregeln](2026-11-15-postlogistik-design.md) gehören in einen deterministischen TypeScript-Core. Die Bedienung folgt dem [UX-Flow](2026-11-15-postlogistik-ux-flow.md).
 

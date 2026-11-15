@@ -2,7 +2,7 @@
 
 Stand: 15. November 2026. Vom Nutzer bestätigte Stilrichtung: **warme Papierkarte mit klarer Routenführung eines Liniennetzes**. Der Spieltitel lautet **Ab die Post**.
 
-Dieses Paket beschreibt die geplante vollständige Oberfläche, einschließlich der noch nicht implementierten Funktionen. Es enthält Bildentwürfe, keine ausführbare Oberfläche und keine Nachweise für Browserbedienbarkeit. Die bisherigen technischen Spezifikationen tragen noch den Arbeitstitel „Symbol-Logistik“.
+Dieses Paket beschreibt die geplante vollständige Oberfläche, einschließlich der noch nicht implementierten Funktionen. Es enthält Bildentwürfe, keine ausführbare Oberfläche und keine Nachweise für Browserbedienbarkeit.
 
 ## Stilanker
 

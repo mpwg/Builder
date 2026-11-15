@@ -1,4 +1,4 @@
-# Symbol-Logistik · UX-Flow
+# Ab die Post · UX-Flow
 
 Die [Spielregeln](2026-11-15-postlogistik-design.md) definieren die Zustellung. Die [Browserarchitektur](2026-11-15-postlogistik-architektur.md) definiert Zustand und Speicherung.
 

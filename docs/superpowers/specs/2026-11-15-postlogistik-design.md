@@ -1,6 +1,6 @@
-# Postlogistik · Entwurf für das TypeScript-Webspiel
+# Ab die Post · Spielentwurf
 
-Dieses Dokument definiert die Spielregeln für Symbol-Logistik. Dazu gehören die [Browserarchitektur](2026-11-15-postlogistik-architektur.md), der [UX-Flow](2026-11-15-postlogistik-ux-flow.md) und der [Web-Umsetzungsplan](../plans/2026-11-15-postlogistik-web-umsetzung.md).
+Dieses Dokument definiert die Spielregeln für Ab die Post. Dazu gehören die [Browserarchitektur](2026-11-15-postlogistik-architektur.md), der [UX-Flow](2026-11-15-postlogistik-ux-flow.md) und der [Web-Umsetzungsplan](../plans/2026-11-15-postlogistik-web-umsetzung.md).
 
 ## 1. Ziel und bestätigte Entscheidungen
 

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "symbol-logistik",
+      "name": "ab-die-post",
       "devDependencies": {
         "@playwright/test": "1.65.1",
         "@types/bun": "^1.4.4",

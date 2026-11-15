@@ -11,7 +11,10 @@ for (const seed of ['Nordring', 'Westpost']) {
     await page.getByLabel('Karten-Seed').fill(seed);
     await page.getByRole('button', { name: 'Starten' }).click();
     await expect(page.getByRole('heading', { name: 'Zustellkarte' })).toBeVisible();
+    const nav = page.getByRole('navigation', { name: 'Betriebsbereiche' });
+    await nav.getByRole('button', { name: 'Gebiete' }).click();
     await expect(page.getByRole('list', { name: 'Zustellgebiete' }).getByRole('button')).toHaveCount(4);
+    await nav.getByRole('button', { name: 'Betrieb' }).click();
     await expect(page.getByTestId('seed')).toHaveText(seed);
     await expect(page.getByTestId('event')).toContainText(/Brief/i, { timeout: 10000 });
     const vehicle = page.locator('[data-testid=vehicle][data-vehicle-type=bike]').first();

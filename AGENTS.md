@@ -2,7 +2,7 @@
 
 ## Einstieg
 
-Builder ist das Repo für Symbol-Logistik, ein statisch auslieferbares TypeScript-Webspiel über Postverteilung. Beginne bei der [README](README.md) und dem [Web-Umsetzungsplan](docs/superpowers/plans/2026-11-15-postlogistik-web-umsetzung.md).
+Builder ist das Repo für Ab die Post, ein statisch auslieferbares TypeScript-Webspiel über Postverteilung. Beginne bei der [README](README.md) und dem [Web-Umsetzungsplan](docs/superpowers/plans/2026-11-15-postlogistik-web-umsetzung.md).
 
 Der [Spielentwurf](docs/superpowers/specs/2026-11-15-postlogistik-design.md) definiert die Regeln. Die [Browserarchitektur](docs/superpowers/specs/2026-11-15-postlogistik-architektur.md) legt die Grenzen zwischen Simulation, Oberfläche und Speicherung fest. Der [UX-Flow](docs/superpowers/specs/2026-11-15-postlogistik-ux-flow.md) beschreibt die Bedienung und Fehlerfälle.
 
