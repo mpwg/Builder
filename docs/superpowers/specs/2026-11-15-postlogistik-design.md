@@ -1,6 +1,6 @@
 # Postlogistik · Entwurf für das TypeScript-Webspiel
 
-Status: Entwurf vom 15. November 2026 zur Freigabe. Die bestätigten Richtungsentscheidungen stehen unten; ergänzende Ausgestaltung ist ausdrücklich ein Vorschlag. Die früheren Spezifikationen vom 14. November beschreiben das abgelöste Ressourcen- und macOS-Konzept und sind keine Grundlage für neue Spielregeln. Ihre vollständige redaktionelle Ablösung und der neue Umsetzungsplan folgen nach Freigabe dieses Entwurfs.
+Dieses Dokument definiert die Spielregeln für Symbol-Logistik. Dazu gehören die [Browserarchitektur](2026-11-15-postlogistik-architektur.md), der [UX-Flow](2026-11-15-postlogistik-ux-flow.md) und der [Web-Umsetzungsplan](../plans/2026-11-15-postlogistik-web-umsetzung.md).
 
 ## 1. Ziel und bestätigte Entscheidungen
 
@@ -8,8 +8,8 @@ Der Spieler betreibt die Post. Eingehende Sendungen werden vom zentralen Postzen
 
 Vom Nutzer bestätigt:
 
-- Reines TypeScript-Webspiel, ohne Backend und ohne lokale Clients. Rust und Godot sind nicht mehr die Zielarchitektur.
-- Symbolische 2D-Darstellung statt realistischer 3D-Modellbahn.
+- Reines TypeScript-Webspiel ohne Backend und ohne lokale Clients.
+- Symbolische 2D-Darstellung.
 - Ganze Zustellgebiete statt einzelner Adressen und Haustürstopps.
 - Postbetrieb als Schwerpunkt; das Straßennetz gibt die Bedingungen vor.
 - Laufender Betrieb mit Pause; automatische Tourenplanung mit manueller Optimierung.
@@ -18,7 +18,7 @@ Vom Nutzer bestätigt:
 - Fahrrad, Lastenrad, Lieferwagen und Lkw. Fußzustellung und Bahn gehören nicht zur ersten Fassung.
 - Kosten und Zufriedenheit sind zentrale Größen. Eine Sanierung muss immer möglich bleiben.
 
-Die folgenden Kapitel konkretisieren diese Entscheidungen als Vorschlag des Entwurfs. Sie gelten erst mit dessen Freigabe als vereinbarter Umfang.
+Die folgenden Kapitel konkretisieren die erste Spielfassung.
 
 ## 2. Betrachtete Ansätze und gewählte Richtung
 
@@ -28,7 +28,7 @@ Die folgenden Kapitel konkretisieren diese Entscheidungen als Vorschlag des Entw
 
 **Rundenbasierte Disposition.** Kapazitäten würden pro Runde verteilt und Ergebnisse anschließend berechnet. Das wäre eine kompakte Strategieoberfläche, würde aber den gewünschten laufenden Betrieb ersetzen. Nicht gewählt.
 
-Technischer Vorschlag: eine statisch auslieferbare Anwendung mit TypeScript, Vite, semantischem HTML, CSS und einer SVG-Karte. Ein eigenständiges TypeScript-Simulationsmodul bleibt von DOM und Browser-Speicherung unabhängig. Für die begrenzte erste Karte braucht es zunächst keine Spielengine und keinen UI-Framework-Unterbau. Canvas oder ein Worker werden nur bei nachgewiesenem Bedarf ergänzt. Diese Werkzeugwahl ist ein Vorschlag des Entwurfs, keine bereits vom Nutzer getroffene Entscheidung.
+Die statische Anwendung verwendet TypeScript, Vite, semantisches HTML, CSS und eine SVG-Karte. Die Simulation ist ein von DOM und Speicherung unabhängiges TypeScript-Modul.
 
 ## 3. Spielkreislauf und Umfang
 
@@ -36,7 +36,7 @@ Technischer Vorschlag: eine statisch auslieferbare Anwendung mit TypeScript, Vit
 
 Eine neue Partie erzeugt aus einem Seed ein kleines zusammenhängendes Netz mit einem Postzentrum, zunächst vier Zustellgebieten und geeigneten Depotstandorten. Alle fünf Sendungsarten und vier Transportmittel sind von Anfang an verfügbar; die Einstiegshilfe führt zuerst durch Briefe und Werbung. Ein ausreichendes Startbudget erlaubt eine geeignete Flotte für alle Arten. Das Zentrum kann selbst als Zustelldepot arbeiten; ein zusätzlicher Bau ist keine Einstiegshürde.
 
-Sendungen treffen nach einem seedabhängigen, reproduzierbaren Aufkommen im Zentrum ein. Jede Sendungsgruppe besitzt Art, Serviceklasse, Zielgebiet, Eingangszeit, Frist und Stückzahl. Gleichartige Sendungen dürfen als Chargen gespeichert werden; beim Aufteilen bleiben Alter und Frist erhalten. Es gibt keine Rohstoffe, Rezepte, Produktion oder ausdrückliche Zielabgabe mehr.
+Sendungen treffen nach einem seedabhängigen, reproduzierbaren Aufkommen im Zentrum ein. Jede Sendungsgruppe besitzt Art, Serviceklasse, Zielgebiet, Eingangszeit, Frist und Stückzahl. Gleichartige Sendungen dürfen als Chargen gespeichert werden; beim Aufteilen bleiben Alter und Frist erhalten.
 
 Der Spieler beobachtet Rückstände, Pünktlichkeit, Kosten und Zufriedenheit, beschafft oder verlegt Fahrzeuge, eröffnet Depots und optimiert Zuständigkeiten und Touren. Fortschritt erweitert die betreute Fläche bewusst statt während einer Krise automatisch weiterzuwachsen: Drei Ausbauziele führen von vier über sechs zu acht Gebieten. Das erste Ziel bewertet die Startgebiete, die nächsten beiden die jeweils bestätigte Erweiterung. Nach dem dritten Ziel bleibt dieselbe Partie frei spielbar. Konkrete Schwellenwerte sind Balancingdaten.
 
@@ -82,7 +82,7 @@ Zur Bergung wird Ladung an das Heimatdepot oder ersatzweise ans Zentrum übertra
 
 ## 4. Darstellung und Bedienung
 
-Eine flache, schematische 2D-Karte zeigt Zustellgebiete als klar abgegrenzte Flächen, Depots als Symbole und Verbindungen als Linien. Keine perspektivischen Gebäude, realistischen Materialien oder dekorative Modellbahnlandschaft. Sendungsarten erhalten eigene Silhouetten, Namen und unterstützende Farben; Dringlichkeit ist eine zusätzliche Kennzeichnung. Gebietsnamen und Zustände bleiben ohne Farberkennung verständlich.
+Eine flache, schematische 2D-Karte zeigt Zustellgebiete als klar abgegrenzte Flächen, Depots als Symbole und Verbindungen als Linien. Sendungsarten erhalten eigene Silhouetten, Namen und unterstützende Farben; Dringlichkeit ist eine zusätzliche Kennzeichnung. Gebietsnamen und Zustände bleiben ohne Farberkennung verständlich.
 
 Die Bedienung umfasst eine Betriebsübersicht, Gebiet- und Depotdetails, Flottenverwaltung, Tourenoptimierung, Problemdiagnose, Sanierung und Spielstände. Ein Problem führt zum betroffenen Gebiet oder Depot und benennt eine konkrete Ursache, etwa „kein Lkw für Speditionsware“, „Ladeplatz ausgelastet“ oder „Vorlage bindet alle geeigneten Fahrzeuge“.
 
@@ -92,10 +92,10 @@ Pause sowie 1×, 2× und 4× betreffen ausschließlich die Simulation. Auswahl, 
 
 - Die Anwendung wird als statische Dateien ausgeliefert. Kein Backend, Konto, Multiplayer, Telemetriedienst oder serverseitiger Spielstand. Statisches Hosting und ein lokaler Entwicklungsserver sind keine Spielserver. Start über `file://` und installierbare PWA sind keine Anforderungen der ersten Fassung.
 - Der TypeScript-Core besitzt Spielzustand, deterministischen Zufallszustand, Sendungsgruppen, Reservierungen, Touren, Finanzen und Bewertungen. Feste Simulationsschritte von 100 ms, stabile Verarbeitungsreihenfolge und ganzzahlige Mengen und Geldwerte erlauben reproduzierbare Tests.
-- Die Oberfläche sendet typisierte Befehle und liest Ansichten. Bestätigungen werden atomar geprüft; abgelehnte Änderungen erhalten den Zustand. Befehlswiederholungen dürfen keine zusätzlichen Käufe, Zustellungen oder Einnahmen erzeugen. Es gibt keine Laufzeitabhängigkeit von Rust, Godot oder WebAssembly.
+- Die Oberfläche sendet typisierte Befehle und liest Ansichten. Bestätigungen werden atomar geprüft; abgelehnte Änderungen erhalten den Zustand. Befehlswiederholungen dürfen keine zusätzlichen Käufe, Zustellungen oder Einnahmen erzeugen.
 - Der Browser taktet die Simulation unabhängig von der Darstellung. Ein verborgenes Dokument pausiert; beim Zurückkehren wird keine verstrichene Wandzeit nachgeholt. Manuelle Pause bleibt davon unabhängig. Bei Überlast wird das Spiel langsamer, statt unbeschränkt Schritte nachzuholen.
 - Automatische und manuelle Spielstände werden getrennt in IndexedDB gespeichert. Ein versioniertes JSON-Format ermöglicht Import und Export. Der Stand enthält Seed, Tick, Zufallszustand, Sendungen samt Alter, aktive Fahrten, Reservierungen, Zuordnungen, Vorlagen, Bewertungsfenster, Finanzen und Fortschritt. Vorschauen und Animationen sind kein Teil des Spielstands.
-- Schreibfehler lassen den letzten gültigen Stand und die laufende Partie bestehen. Die Oberfläche meldet fehlgeschlagene Speicherung und bietet Dateiexport an. Ungültige oder zu neue Importe ersetzen weder Partie noch Sicherung. Browserdaten können gelöscht werden; Export ist die unabhängige Sicherung. Kein Import alter Ressourcen-Spielstände und keine erfundene Migrationspflicht für bislang nicht implementierte Godot-Spielstände.
+- Schreibfehler lassen den letzten gültigen Stand und die laufende Partie bestehen. Die Oberfläche meldet fehlgeschlagene Speicherung und bietet Dateiexport an. Ungültige oder zu neue Importe ersetzen weder Partie noch Sicherung. Browserdaten können gelöscht werden; Export ist die unabhängige Sicherung.
 - Ziel sind Desktop-Browser mit Maus und Tastatur. Chromium, Firefox und Safari werden praktisch geprüft; tatsächliche Versionen und Geräte werden dokumentiert. Modern Web Guidance wird vor Web-Implementierung gezielt abgefragt, mit `bunx --bun modern-web-guidance@latest`. Ohne eigens vereinbarte Browserpolitik gilt dessen Baseline- und Fallback-Regel. Mobile Optimierung ist ein späteres Paket.
 
 ## 6. Abnahme und Übergang
@@ -114,8 +114,4 @@ Fachliche Prüfungen:
 - Speichern und Laden während Fahrt, Umladen und manueller Vorgaben liefert bei denselben Folgeeingaben denselben Zustand wie ein ununterbrochener Lauf. Beschädigte Importe und Speicherfehler erhalten bestehende Daten.
 - Bedienung bei 1280 × 720 und 1920 × 1080, Tastaturnavigation, Graustufen und reduzierter Bewegung wird im Browser geprüft. Leistungsprüfung: acht Gebiete, 100 Fahrzeuge und 10.000 offene Sendungen als Chargen; bei 1× kein wachsender Rückstand der Simulation und flüssige Bedienung. Gerät, Browser, Build und Messung müssen angegeben werden.
 
-Nach Freigabe wird die Dokumentation als zusammengehöriges Paket umgestellt: README und AGENTS.md unterscheiden den noch vorhandenen Altcode vom neuen Ziel; Spielentwurf, Architektur und UX-Vertrag erhalten die Postregeln; ein neuer Web-Umsetzungsplan ersetzt beide bisherigen Implementierungspläne als Arbeitsgrundlage. Die alte Browser-Vorschau wird als historischer Ressourcen-Prototyp gekennzeichnet. Alte Pläne bleiben nachvollziehbar archiviert und verlieren ihre normative Wirkung.
-
-Der Richtungswechsel ist kein abgeschlossener Code-Port. Vorhandene Rust-/Godot-Dateien und Bildassets werden in diesem Dokumentationspaket weder gelöscht noch umgebaut. Im neuen Umsetzungsplan beginnt die produktive Web-App separat; eine spätere Bereinigung des Altbestands ist ein eigenes explizites Arbeitspaket. Projekt- und Paketname bleiben bis zu einer eigenen Namensentscheidung „Builder“ beziehungsweise „Symbol-Logistik“; „Postlogistik“ beschreibt das neue Spielkonzept.
-
-Nicht Teil der ersten Fassung: Produktionsketten, Rohstoffwirtschaft, Einzeladressen, Abholung, Rücksendungen, Personalverwaltung, Straßenbau, Ampelsteuerung, Bahn, Katastrophen, 3D, native Clients, Backend und Cloud-Synchronisation. Die Umsetzung darf interne Datenstrukturen, Algorithmen innerhalb der beschriebenen Prioritätsregeln und numerische Balancingwerte festlegen; zusätzliche Spielsysteme bedürfen einer neuen Umfangsentscheidung.
+Die Umsetzung legt interne Datenstrukturen und numerische Balancingwerte innerhalb der beschriebenen Regeln fest.
