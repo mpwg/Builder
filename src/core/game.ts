@@ -1,116 +1,63 @@
-import { ARRIVAL_INTERVAL_TICKS, FIRST_ARRIVAL_TICKS, SHIPMENTS } from './balance';
-import { addShipment, describeShipment, dispatch } from './dispatch';
+import {
+  ARRIVAL_INTERVAL_TICKS, ARRIVAL_KINDS, CENTER_LOADING_BAYS, DEPOT_CAPACITY, DEPOT_LOADING_BAYS,
+  FIRST_ARRIVAL_TICKS, RUNNING_COST_INTERVAL, SHIPMENTS, START_BUDGET, START_FLEET, VEHICLES,
+} from './balance';
+import { createVehicle } from './commands';
+import { chargeOperation, dispatch } from './dispatch';
 import { CENTER_ID, createMap, getMapNode } from './map';
-import type { CommandEnvelope, CommandResult, GameState, GameView, ShipmentCounts, VehicleView } from './model';
+import type { GameState, ShipmentBatch } from './model';
 import { randomInteger, seedNumber } from './random';
+import { describeShipments } from './shipments';
+
+export { applyCommand } from './commands';
+export { readView } from './view';
 
 export function createGame(seed: string): GameState {
   const [nextArrivalTick, randomState] = randomInteger(
-    seedNumber(`Eingang:${seed}`),
-    FIRST_ARRIVAL_TICKS.minimum,
-    FIRST_ARRIVAL_TICKS.maximum,
+    seedNumber(`Eingang:${seed}`), FIRST_ARRIVAL_TICKS.minimum, FIRST_ARRIVAL_TICKS.maximum,
   );
+  const map = createMap(seed);
   return {
-    seed,
-    tick: 0,
-    map: createMap(seed),
-    randomState,
-    nextArrivalTick,
-    nextArrivalKind: 'letter',
-    waiting: [],
-    delivered: {},
-    vehicle: { phase: 'idle' },
-    revenue: 0,
+    seed, map, tick: 0, revision: 0, appliedCommandIds: [], randomState,
+    nextArrivalTick, arrivalCount: 0, waiting: [], delivered: {},
+    districts: map.nodes.filter(({ kind }) => kind === 'district').map(({ id }) => ({ id, depotId: CENTER_ID, priority: 1 })),
+    depots: map.nodes.filter(({ kind }) => kind !== 'district').map(({ id }) => ({
+      id, open: id === CENTER_ID, closing: false, capacity: id === CENTER_ID ? null : DEPOT_CAPACITY,
+      loadingBays: id === CENTER_ID ? CENTER_LOADING_BAYS : DEPOT_LOADING_BAYS, bundleWaitTicks: 0,
+    })),
+    vehicles: START_FLEET.map((type, index) => createVehicle(type, CENTER_ID, index + 1)),
+    budget: START_BUDGET, revenue: 0, expenses: 0, operatingExpenses: 0, investmentExpenses: 0,
     latestEvent: 'Das Postzentrum wartet auf den ersten Eingang.',
   };
 }
 
 function receiveShipment(state: GameState): GameState {
-  const { tick, nextArrivalKind: kind } = state;
+  const { tick, districts, arrivalCount } = state;
   if (tick !== state.nextArrivalTick) return state;
-
-  const districts = state.map.nodes.filter((node) => node.kind === 'district');
+  const kind = ARRIVAL_KINDS[arrivalCount % ARRIVAL_KINDS.length];
+  const { minimumBatch, maximumBatch, deadline, expressDeadline } = SHIPMENTS[kind];
   const [targetIndex, afterTarget] = randomInteger(state.randomState, 0, districts.length - 1);
-  const district = districts[targetIndex];
-  if (!district) throw new Error('Das Postnetz enthält kein verfügbares Zustellgebiet.');
-  const { minimumBatch, maximumBatch } = SHIPMENTS[kind];
   const [quantity, afterQuantity] = randomInteger(afterTarget, minimumBatch, maximumBatch);
   const [interval, randomState] = randomInteger(
-    afterQuantity,
-    ARRIVAL_INTERVAL_TICKS.minimum,
-    ARRIVAL_INTERVAL_TICKS.maximum,
+    afterQuantity, ARRIVAL_INTERVAL_TICKS.minimum, ARRIVAL_INTERVAL_TICKS.maximum,
   );
-  const batch = { arrivalTick: tick, districtId: district.id, kind, quantity };
+  const districtId = districts[targetIndex].id;
+  const express = expressDeadline !== null && Math.floor(arrivalCount / ARRIVAL_KINDS.length) % 2 === 1;
+  const batch: ShipmentBatch = {
+    id: `eingang-${arrivalCount + 1}`, depotId: CENTER_ID, arrivalTick: tick, districtId, kind, quantity,
+    serviceClass: express ? 'express' : 'standard', deadlineTick: tick + (express ? expressDeadline : deadline),
+  };
   return {
-    ...state,
-    randomState,
-    nextArrivalTick: tick + interval,
-    nextArrivalKind: kind === 'letter' ? 'ad' : 'letter',
+    ...state, randomState, nextArrivalTick: tick + interval, arrivalCount: arrivalCount + 1,
     waiting: [...state.waiting, batch],
-    latestEvent: `${describeShipment(batch)} für ${district.name} im Postzentrum eingegangen.`,
+    latestEvent: `${describeShipments([batch])} für ${getMapNode(state.map, districtId).name} im Postzentrum eingegangen.`,
   };
 }
 
 export function step(state: GameState): GameState {
-  return dispatch(receiveShipment({ ...state, tick: state.tick + 1 }));
-}
-
-export function applyCommand(state: GameState, _command: CommandEnvelope): CommandResult {
-  return { ok: false, state, reason: 'Für die erste Zustellung sind keine Spielerbefehle verfügbar.' };
-}
-
-function readVehicle(state: GameState): VehicleView {
-  const { tick, map, vehicle } = state;
-  const center = getMapNode(map, CENTER_ID);
-  if (vehicle.phase === 'idle' || vehicle.phase === 'loading') {
-    return { x: center.x, y: center.y, phase: 'idle', targetId: null, cargo: 0 };
+  let next = receiveShipment({ ...state, tick: state.tick + 1 });
+  if (next.tick % RUNNING_COST_INTERVAL === 0) {
+    next = chargeOperation(next, next.vehicles.reduce((sum, { type }) => sum + VEHICLES[type].runningCost, 0));
   }
-
-  const returning = vehicle.phase === 'returning';
-  const district = getMapNode(map, returning ? vehicle.districtId : vehicle.batch.districtId);
-  if (vehicle.phase === 'servicing') {
-    return {
-      x: district.x,
-      y: district.y,
-      phase: vehicle.phase,
-      targetId: district.id,
-      cargo: vehicle.batch.quantity,
-    };
-  }
-
-  const from = returning ? district : center;
-  const to = returning ? center : district;
-  const progress = 1 - (vehicle.phaseEndsAt - tick) / vehicle.travelTicks;
-  return {
-    x: from.x + (to.x - from.x) * progress,
-    y: from.y + (to.y - from.y) * progress,
-    phase: vehicle.phase,
-    targetId: to.id,
-    cargo: returning ? 0 : vehicle.batch.quantity,
-  };
-}
-
-export function readView(state: GameState): GameView {
-  const waiting = new Map<string, ShipmentCounts>();
-  for (const batch of state.waiting) {
-    waiting.set(batch.districtId, addShipment(waiting.get(batch.districtId), batch));
-  }
-
-  const districts = state.map.nodes.filter((node) => node.kind === 'district').map(({ id }) => ({
-    id,
-    lettersWaiting: waiting.get(id)?.letter ?? 0,
-    adsWaiting: waiting.get(id)?.ad ?? 0,
-    lettersDelivered: state.delivered[id]?.letter ?? 0,
-    adsDelivered: state.delivered[id]?.ad ?? 0,
-  }));
-
-  return {
-    seed: state.seed,
-    tick: state.tick,
-    map: state.map,
-    vehicle: readVehicle(state),
-    districts,
-    revenue: state.revenue,
-    latestEvent: state.latestEvent,
-  };
+  return dispatch(next);
 }

@@ -92,7 +92,7 @@ main { width: min(calc(100% - 3rem), 1440px); margin: 0 auto; }
 .depot-pin { fill: var(--paper); stroke: var(--ink); stroke-width: .65px; }
 .district-pin { fill: var(--paper); stroke: var(--ink); stroke-width: .75px; cursor: pointer; }
 .map-label { fill: var(--ink); font-size: 3.25px; font-weight: 800; text-anchor: middle; paint-order: stroke; stroke: #f9f4e8; stroke-width: .53px; stroke-linejoin: round; pointer-events: none; }
-.vehicle { pointer-events: none; }
+.vehicle { cursor: pointer; }
 .vehicle.parked { opacity: .85; }
 .vehicle-disc { fill: var(--yellow); stroke: var(--ink); stroke-width: .6px; }
 .bike-glyph { fill: none; stroke: var(--ink); stroke-width: .36px; stroke-linecap: round; stroke-linejoin: round; }
@@ -137,3 +137,81 @@ main { width: min(calc(100% - 3rem), 1440px); margin: 0 auto; }
   .cover-art svg { max-height: 220px; }
   .game-head { align-items: start; flex-direction: column; }
 }
+
+.vehicle.selected { opacity: 1; }
+.vehicle.selected .vehicle-disc { stroke-width: 1.15px; }
+.depot-node { cursor: pointer; }
+.depot-node.open .depot-pin, .depot-node.closing .depot-pin { fill: var(--ink); }
+.depot-status-mark { fill: none; stroke: var(--paper); stroke-width: .5px; stroke-linecap: round; }
+.work-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1.25rem;
+  padding: 0 0 .7rem;
+}
+.work-nav a, .tool-link { color: var(--ink); font-size: .87rem; font-weight: 750; text-underline-offset: .22em; }
+.tool-link { display: inline-block; margin-top: .55rem; }
+.operations {
+  margin: 0 0 2rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .9rem;
+  align-items: start;
+}
+.op-panel { padding: 1rem 1.1rem 1.15rem; border: 1px solid var(--ink); background: var(--paper); min-width: 0; }
+.op-head { border-bottom: 1px solid var(--line); padding-bottom: .7rem; margin-bottom: .8rem; }
+.op-head h2 { font: 500 1.7rem/1.15 Georgia, serif; letter-spacing: -.035em; scroll-margin-top: 1rem; }
+.op-head .eyebrow { margin-bottom: .25rem; }
+.op-form { display: grid; gap: .35rem; margin: .75rem 0 0; }
+.op-form label { font-size: .86rem; font-weight: 750; }
+.op-form :is(input, select) {
+  min-height: 48px;
+  min-width: 0;
+  font: inherit;
+  color: var(--ink);
+  background: #fffdf5;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  padding: .45rem .6rem;
+}
+.op-form :is(input, select):user-invalid { outline: 2px solid #a24927; }
+.op-form button, .op-row button { min-height: 48px; }
+.op-row { display: flex; flex-wrap: wrap; gap: .45rem; }
+.op-row :is(input, select) { flex: 1 1 10rem; }
+.op-stat { font-size: .88rem; line-height: 1.4; margin: .5rem 0; }
+.feedback { font-size: .85rem; line-height: 1.4; }
+.feedback.error { color: #8c391b; font-weight: 700; }
+.feedback:not(:empty) { padding-block: .35rem; }
+.shipment-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.shipment-table caption { text-align: left; margin-bottom: .4rem; }
+.shipment-table :is(td, th) { border-bottom: 1px solid var(--line); padding: .28rem; text-align: right; }
+.shipment-table :is(td, th):first-child { text-align: left; }
+.shipment-table td { font-variant-numeric: tabular-nums; }
+#tour-stops { margin-block: .3rem; padding-inline-start: 1.5rem; }
+#tour-stops li { padding-block: .2rem; border-bottom: 1px solid var(--line); }
+#tour-stops li > span { margin-inline-end: .5rem; }
+.tour-actions { display: inline-flex; flex-wrap: wrap; gap: .25rem; }
+.tour-actions button { min-width: 48px; }
+.tour-actions [aria-disabled="true"] { opacity: .4; cursor: default; }
+.problem-list { padding-left: 1.1rem; }
+.problem-list li + li { margin-top: .45rem; }
+.problem-list button { text-align: left; }
+.overview-accounts { display: flex; flex-wrap: wrap; gap: .6rem 1.3rem; margin-top: 0; }
+.overview-accounts dt { font-size: .8rem; }
+.overview-accounts dd { margin: 0; font-size: 1.15rem; font-weight: 750; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (width < 850px) { .operations { grid-template-columns: minmax(0, 1fr); } }
+
+.shipment-symbols { position: absolute; overflow: hidden; }
+.shipment-icon {
+  inline-size: 1.1rem;
+  block-size: 1.1rem;
+  margin-inline-end: .34rem;
+  vertical-align: -.23em;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+.stamp-disc { fill: var(--paper); }

@@ -4,7 +4,11 @@ Symbol-Logistik ist ein Browser-Spiel über den Betrieb eines Postnetzes. Eingeh
 
 Die Tourenplanung läuft automatisch. Du kannst Flotte, Gebietszuständigkeiten, Prioritäten und Tourvorlagen anpassen. Auf einer symbolischen 2D-Karte beobachtest du den Betrieb in Echtzeit und kannst jederzeit pausieren. Kosten, Pünktlichkeit und Zufriedenheit zeigen die Folgen deiner Entscheidungen. Ein festgefahrener Betrieb lässt sich jederzeit sanieren.
 
-Meilenstein 1 ist spielbar. Ein Fahrrad stellt Briefe und Werbung vom Postzentrum aus automatisch zu. Verfolge die Fahrt und die Erlösbuchung. Wähle ein Gebiet auf der Karte oder in der Liste, um offene und zugestellte Mengen zu sehen. Du kannst jederzeit pausieren oder das Spieltempo erhöhen.
+Meilenstein 2 ist spielbar. Fahrrad, Lastenrad, Lieferwagen und Lkw verteilen alle fünf Sendungsarten. In der Gebietsliste siehst du offene, überfällige und zugestellte Mengen. Die Betriebsanzeige trennt Einnahmen, Investitionen und Betriebskosten.
+
+Für den ersten Depotumschlag unter **Depots** einen Standort eröffnen. In der Gebietsliste ein Gebiet auswählen und über **Gebiet bearbeiten** dem neuen Depot zuordnen. Anschließend unter **Flotte** ein passendes Fahrzeug zum Depot verlegen oder dort kaufen. Sendungen kommen per Transfer aus dem Postzentrum. Für Speditionsware braucht auch das zustellende Depot einen Lkw.
+
+Unter **Touren** lassen sich Halte für das unter **Flotte** ausgewählte Fahrzeug hinzufügen, umsortieren und als verbindliche Tourvorlage speichern. **Automatik übernehmen lassen** gibt das Fahrzeug für die automatische Planung frei. Eine laufende Tour behält ihre Halte.
 
 ## Lokal spielen
 

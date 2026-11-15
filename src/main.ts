@@ -1,10 +1,10 @@
 import { createClock } from './browser/clock';
-import { createGame, readView, step } from './core/game';
+import { applyCommand, createGame, readView, step } from './core/game';
 import { drawMap } from './ui/map';
 
-function byId<T extends Element = HTMLElement>(id: string): T {
-  return document.querySelector<T>('#' + id)!;
-}
+import type { Command } from './core/model';
+import { byId, money, setText } from './ui/dom';
+import { createWorkbench } from './ui/workbench';
 
 const menu = byId('menu');
 const game = byId('game');
@@ -19,14 +19,6 @@ const districts = byId('districts');
 const clockOutput = byId('clock');
 const speeds = document.querySelectorAll<HTMLButtonElement>('[data-speed]');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const currency = new Intl.NumberFormat('de-AT', { style: 'currency', currency: 'EUR' });
-const phases = {
-  idle: 'Am Postzentrum',
-  outbound: 'Auf Zustellfahrt',
-  servicing: 'Zustellung im Gebiet',
-  returning: 'Auf dem Rückweg',
-};
-
 let state: ReturnType<typeof createGame> | undefined;
 let view: ReturnType<typeof readView>;
 let previous: typeof view;
@@ -35,6 +27,8 @@ let selected = '';
 let paused = false;
 let frameId = 0;
 let zoom = 1;
+let commandId = 0;
+let displayed: typeof view | undefined;
 const areaButtons = new Map<string, HTMLButtonElement>();
 
 const clock = createClock(() => {
@@ -44,40 +38,57 @@ const clock = createClock(() => {
   view = readView(state);
 });
 
-function setText(element: Element, value: string) {
-  if (element.textContent !== value) element.textContent = value;
+const workbench = createWorkbench(send, selectDistrict, () => paint(1));
+
+function send(command: Command) {
+  if (!state) return 'Starte zuerst eine Partie.';
+  const result = applyCommand(state, { id: String(++commandId), baseRevision: view.revision, command });
+  if (!result.ok) return result.reason;
+  previous = view;
+  state = result.state;
+  view = readView(state);
+  render();
+}
+
+function paint(alpha: number) {
+  map.render(view.vehicles, previous.vehicles, reduced.matches || paused ? 1 : alpha, view.depots, workbench.selectedVehicle());
 }
 
 function render(alpha = 1) {
-  const seconds = Math.floor(view.tick / 10);
-  const time = [Math.floor(seconds / 60), seconds % 60].map(n => String(n).padStart(2, '0')).join(':');
-  clockOutput.dataset.tick = String(view.tick);
-  setText(clockOutput, time);
-  setText(byId('letters'), String(view.districts.reduce((n, area) => n + area.lettersDelivered, 0)));
-  setText(byId('revenue'), currency.format(view.revenue / 100));
-  setText(byId('phase'), phases[view.vehicle.phase]);
-  const target = view.map.nodes.find(node => node.id === view.vehicle.targetId)?.name;
-  setText(byId('cargo'), `Ladung: ${view.vehicle.cargo}${target ? ' · Ziel: ' + target : ''}`);
-  setText(byId('event'), view.latestEvent);
-  map.render(view.vehicle, previous.vehicle, reduced.matches || paused ? 1 : alpha);
-  renderDistricts();
+  if (displayed !== view) {
+    displayed = view;
+    const seconds = Math.floor(view.tick / 10);
+    const time = [Math.floor(seconds / 60), seconds % 60].map(n => String(n).padStart(2, '0')).join(':');
+    clockOutput.dataset.tick = String(view.tick);
+    setText(clockOutput, time);
+    setText(byId('revenue'), money(view.revenue));
+    setText(byId('event'), view.latestEvent);
+    renderDistricts();
+    workbench.update(view);
+  }
+  paint(alpha);
 }
 
 function renderDistricts() {
   for (const area of view.districts) {
     const button = areaButtons.get(area.id)!;
-    const count = area.lettersWaiting + area.adsWaiting;
+    const count = area.waiting.reduce((total, item) => total + item.quantity, 0);
     setText(button.lastElementChild!, String(count));
     button.setAttribute('aria-pressed', String(selected === area.id));
   }
-  const area = view.districts.find(area => area.id === selected)!;
-  setText(byId('details'), `Offen: ${area.lettersWaiting} Briefe, ${area.adsWaiting} Werbung. Zugestellt: ${area.lettersDelivered} Briefe, ${area.adsDelivered} Werbung.`);
+  const area = view.districts.find(area => area.id === selected);
+  if (!area) return;
+  const total = area.waiting.reduce((n, item) => n + item.quantity, 0);
+  const overdue = area.waiting.reduce((n, item) => n + item.overdue, 0);
+  const delivered = area.delivered.reduce((n, item) => n + item.quantity, 0);
+  setText(byId('details'), `Offen: ${total} · davon überfällig: ${overdue} · zugestellt: ${delivered}`);
 }
 
 function selectDistrict(id: string) {
   selected = id;
   map.select(id);
   renderDistricts();
+  workbench.selectArea(id);
 }
 
 function synchronizeFrames() {
@@ -114,6 +125,8 @@ function setZoom(value: number) {
 function start(value: string) {
   state = createGame(value);
   previous = view = readView(state);
+  commandId = 0;
+  workbench.reset();
   byId('seed').textContent = view.seed;
   areaButtons.clear();
   districts.replaceChildren();
@@ -134,7 +147,14 @@ function start(value: string) {
     districts.append(item);
     areaButtons.set(area.id, button);
   });
-  map = drawMap(mapSvg, view.map, selectDistrict);
+  map = drawMap(mapSvg, view.map, selectDistrict, id => {
+    workbench.selectDepot(id);
+    byId('depot-work').focus();
+  }, id => {
+    workbench.selectVehicle(id);
+    byId('fleet-work').focus();
+  });
+  workbench.update(view);
   selectDistrict(view.districts[0].id);
   menu.hidden = true;
   game.hidden = false;

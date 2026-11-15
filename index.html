@@ -8,6 +8,13 @@
   <link rel="stylesheet" href="/src/ui/styles.css">
 </head>
 <body>
+  <svg class="shipment-symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="0" height="0">
+    <symbol id="shipment-ad" viewBox="0 0 20 20"><path d="M3 5h11v10H3zM7 5V2h10v10h-3M6 8h5m-5 3h5"/></symbol>
+    <symbol id="shipment-letter" viewBox="0 0 20 20"><path d="M2 5h16v10H2zM2 5l8 6 8-6"/></symbol>
+    <symbol id="shipment-registered" viewBox="0 0 20 20"><path d="M2 4h16v10H2zM2 4l8 6 8-6"/><circle cx="14" cy="13" r="4.5" class="stamp-disc"/><path d="m12 13 1.5 1.5 2.5-3"/></symbol>
+    <symbol id="shipment-parcel" viewBox="0 0 20 20"><path d="m3 6 7-3 7 3v8l-7 3-7-3zm0 0 7 3 7-3m-7 3v8M6.5 4.5l7 3v3"/></symbol>
+    <symbol id="shipment-freight" viewBox="0 0 20 20"><path d="M2 5h16v10H2zm0 0 16 10M18 5 2 15m3 0v2m10-2v2"/></symbol>
+  </svg>
   <header class="masthead">
     <div class="brand"><svg width="30" height="24" viewBox="0 0 30 24" aria-hidden="true"><path d="M2 3h26v18H2zM2 4l13 10L28 4" fill="none" stroke="currentColor" stroke-width="2"/></svg> Symbol-Logistik</div>
     <button id="menu-button" type="button" hidden>Hauptmenü</button>
@@ -16,7 +23,7 @@
     <section id="menu" class="cover">
       <div class="cover-copy">
         <h1>Die Post<br>ist unterwegs<span>.</span></h1>
-        <p>Vom Postzentrum in vier Zustellgebiete. Begleite die erste Fahrradtour auf deiner eigenen Netzkarte.</p>
+        <p>Vom Postzentrum in vier Zustellgebiete. Verteile Sendungen, verwalte deine Flotte und plane Touren auf deiner eigenen Netzkarte.</p>
         <button class="primary" id="new-game" type="button">Neue Partie <span aria-hidden="true">↗</span></button>
         <form id="seed-form" hidden>
           <label for="seed-input">Karten-Seed</label>
@@ -47,6 +54,13 @@
         </div>
       </header>
       <p id="pause-note" hidden>Simulation pausiert.</p>
+      <nav class="work-nav" aria-label="Betriebsbereiche">
+        <a href="#district-work">Gebiet ↓</a>
+        <a href="#depot-work">Depots ↓</a>
+        <a href="#fleet-work">Flotte ↓</a>
+        <a href="#tour-work">Touren ↓</a>
+        <a href="#problems-work">Probleme ↓</a>
+      </nav>
       <div class="board">
         <section class="map-panel" aria-label="Netzkarte">
           <div class="map-tools" role="group" aria-label="Kartenausschnitt">
@@ -59,22 +73,104 @@
         </section>
         <aside class="dispatch" aria-label="Postbetrieb">
           <section class="summary">
-            <div><span>Briefe zugestellt</span><strong data-testid="letters-delivered" id="letters">0</strong></div>
+            <div><span>Sendungen zugestellt</span><strong id="delivered">0</strong></div>
             <div><span>Einnahmen</span><strong data-testid="revenue" id="revenue">0,00 €</strong></div>
           </section>
           <section class="current">
-            <p class="eyebrow">Fahrrad</p><h2 id="phase">Bereit</h2>
-            <p id="cargo"></p>
-            <p data-testid="event" id="event" aria-live="polite"></p>
+            <p class="eyebrow">Betrieb</p><h2>Letzte Meldung</h2>
+            <p data-testid="event" id="event"></p>
           </section>
           <section class="areas">
             <h2>Zustellgebiete</h2>
             <ul id="districts" aria-label="Zustellgebiete"></ul>
             <p id="details"></p>
+            <a class="tool-link" href="#district-work">Gebiet bearbeiten ↓</a>
           </section>
         </aside>
       </div>
-      <details id="guide" open><summary>Einstiegshilfe</summary><p>Warte auf den ersten Briefeingang. Sobald das Fahrrad beladen ist, zeigt die Karte die Fahrt zum Ziel. Dort wird der Brief zugestellt und anschließend fährt das Fahrrad zum Zentrum zurück. Die Gebietsliste zeigt Rückstand und zugestellte Sendungen.</p></details>
+      <details id="guide" open><summary>Einstiegshilfe</summary><p>Die Startflotte stellt automatisch zu. Für einen Depotumschlag eröffne einen Standort, ordne ihm ein Zustellgebiet zu und verlege ein geeignetes Fahrzeug dorthin. Fahrzeuge im Postzentrum bringen die Sendungen zum Depot. Tourvorlagen bestimmen die Reihenfolge der Gebiete für ein ausgewähltes Fahrzeug.</p></details>
+      <div id="operations" class="operations">
+        <section class="op-panel" aria-labelledby="district-work">
+          <header class="op-head"><p class="eyebrow">Zustellgebiete</p><h2 id="district-work" tabindex="-1"></h2></header>
+          <table class="shipment-table">
+            <caption>Sendungen im Gebiet</caption>
+            <thead><tr><th scope="col">Art</th><th scope="col">Offen</th><th scope="col">Überfällig</th><th scope="col">Zugestellt</th></tr></thead>
+            <tbody id="district-shipments"></tbody>
+          </table>
+          <p class="op-stat" id="district-classes"></p>
+          <form method="post" aria-labelledby="district-work depot-district-label" id="assign-form" class="op-form">
+            <label for="district-depot" id="depot-district-label">Zuständiges Depot</label>
+            <div class="op-row"><select name="depot" id="district-depot" required></select><button type="submit">Zuständigkeit übernehmen</button></div>
+            <p class="feedback" role="status" tabindex="-1"></p>
+          </form>
+          <form method="post" aria-labelledby="district-work priority-label" id="priority-form" class="op-form">
+            <label for="priority" id="priority-label">Gebietsvorrang</label>
+            <div class="op-row"><select name="priority" id="priority"><option value="0">Niedrig</option><option value="1">Normal</option><option value="2">Hoch</option></select><button type="submit">Vorrang übernehmen</button></div>
+            <p class="feedback" role="status" tabindex="-1"></p>
+          </form>
+        </section>
+        <section class="op-panel" aria-labelledby="depot-work">
+          <header class="op-head"><p class="eyebrow">Umschlag</p><h2 id="depot-work" tabindex="-1">Depots</h2></header>
+          <div class="op-form"><label for="depot-choice">Depotstandort</label><select name="depot" id="depot-choice"></select></div>
+          <p class="op-stat" id="depot-status" data-testid="depot-status"></p>
+          <p class="op-stat" id="depot-closure-plan" hidden></p>
+          <div class="op-row"><button id="open-depot" type="button"></button><button id="close-depot" type="button">Depot räumen</button></div>
+          <p class="feedback" role="status" tabindex="-1" id="depot-feedback"></p>
+          <form method="post" aria-labelledby="depot-work bundle-label" id="bundle-form" class="op-form">
+            <label for="bundle" id="bundle-label">Maximale Bündelwartezeit (Sekunden)</label>
+            <div class="op-row"><input name="seconds" id="bundle" type="number" min="0" max="30" step="0.1" required><button type="submit">Wartezeit übernehmen</button></div>
+            <p class="feedback" role="status" tabindex="-1"></p>
+          </form>
+        </section>
+        <section class="op-panel" aria-labelledby="fleet-work">
+          <header class="op-head"><p class="eyebrow">Fahrzeuge</p><h2 id="fleet-work" tabindex="-1">Flotte</h2></header>
+          <div class="op-form"><label for="vehicle-choice">Fahrzeug auswählen</label><select name="vehicle" id="vehicle-choice"></select></div>
+          <p id="vehicle-status" class="op-stat" data-testid="vehicle-status"></p>
+          <p id="vehicle-eligible" class="op-stat"></p>
+          <form method="post" aria-labelledby="fleet-work relocate-label" id="relocate-form" class="op-form">
+            <label for="relocate-depot" id="relocate-label">Neues Heimatdepot</label>
+            <div class="op-row"><select name="depot" id="relocate-depot" required aria-describedby="relocate-cost"></select><button type="submit">Fahrzeug verlegen</button></div>
+            <p id="relocate-cost" class="op-stat"></p>
+            <p class="feedback" role="status" tabindex="-1"></p>
+          </form>
+          <form method="post" aria-labelledby="fleet-work buy-label" id="buy-form" class="op-form">
+            <label for="buy-type" id="buy-label">Fahrzeugtyp kaufen</label><select name="type" id="buy-type" required></select>
+            <label for="buy-depot">Standort für neues Fahrzeug</label><select name="depot" id="buy-depot" required></select>
+            <p id="buy-details" class="op-stat"></p>
+            <button type="submit" id="buy-vehicle">Fahrzeug kaufen</button>
+            <p class="feedback" role="status" tabindex="-1"></p>
+          </form>
+        </section>
+        <section class="op-panel" aria-labelledby="tour-work">
+          <header class="op-head"><p class="eyebrow">Disposition</p><h2 id="tour-work" tabindex="-1">Tourvorlage</h2></header>
+          <p class="op-stat" id="template-mode" data-testid="template-mode"></p>
+          <p class="op-stat" id="tour-remaining"></p>
+          <p class="op-stat" id="tour-estimate"></p>
+          <p class="op-stat" id="tour-wait"></p>
+          <form method="post" aria-labelledby="tour-work" id="tour-form" class="op-form">
+            <label for="tour-district">Gebiet für Tourvorlage</label>
+            <div class="op-row"><select name="district" id="tour-district"></select><button type="button" id="tour-add">Gebiet hinzufügen</button></div>
+            <ol id="tour-stops" aria-label="Reihenfolge der Tourhalte"></ol>
+            <p id="reorder-status" class="visually-hidden" role="status"></p>
+            <div class="op-row"><button type="submit">Tourvorlage speichern</button><button type="button" id="clear-template">Automatik übernehmen lassen</button></div>
+            <p class="feedback" role="status" tabindex="-1"></p>
+          </form>
+        </section>
+        <section class="op-panel" aria-labelledby="problems-work">
+          <header class="op-head"><h2 id="problems-work" tabindex="-1">Probleme</h2></header>
+          <p id="no-problems" class="op-stat">Keine aktuellen Probleme.</p>
+          <ul id="problems" class="problem-list"></ul>
+        </section>
+        <section class="op-panel" aria-labelledby="totals-work">
+          <header class="op-head"><h2 id="totals-work">Betriebsübersicht</h2></header>
+          <dl class="overview-accounts"><div><dt>Budget</dt><dd id="budget"></dd></div><div><dt>Investitionen</dt><dd id="investment"></dd></div><div><dt>Betriebskosten</dt><dd id="operating-expenses"></dd></div></dl>
+          <table class="shipment-table">
+            <caption>Zugestellte Sendungen im gesamten Netz</caption>
+            <thead><tr><th scope="col">Art</th><th scope="col">Standard</th><th scope="col">Express</th></tr></thead>
+            <tbody id="shipment-totals"></tbody>
+          </table>
+        </section>
+      </div>
     </section>
   </main>
   <script type="module" src="/src/main.ts"></script>

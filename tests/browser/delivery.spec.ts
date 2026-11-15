@@ -14,11 +14,11 @@ for (const seed of ['Nordring', 'Westpost']) {
     await expect(page.getByRole('list', { name: 'Zustellgebiete' }).getByRole('button')).toHaveCount(4);
     await expect(page.getByTestId('seed')).toHaveText(seed);
     await expect(page.getByTestId('event')).toContainText(/Brief/i, { timeout: 10000 });
-    const vehicle = page.getByTestId('vehicle');
+    const vehicle = page.locator('[data-testid=vehicle][data-vehicle-type=bike]').first();
     await expect(vehicle).toHaveAttribute('data-phase', 'outbound', { timeout: 10000 });
     const initial = await vehicle.getAttribute('transform');
     await expect.poll(() => vehicle.getAttribute('transform')).not.toBe(initial);
-    await expect(page.getByTestId('letters-delivered')).not.toHaveText('0', { timeout: 15000 });
+    await expect(page.locator('[data-delivered-kind="letter"]')).not.toHaveAttribute('data-count', '0', { timeout: 15000 });
     await expect(page.getByTestId('revenue')).not.toContainText('0,00');
     await page.getByRole('button', { name: 'Pause', exact: true }).click();
     const tick = await page.getByTestId('clock').getAttribute('data-tick');

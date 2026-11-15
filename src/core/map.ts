@@ -1,4 +1,4 @@
-import type { GameMap, MapEdge, MapNode } from './model';
+import type { GameMap, MapEdge, MapNode, RouteLeg } from './model';
 import { randomInteger, seedNumber } from './random';
 
 export const CENTER_ID = 'center';
@@ -56,4 +56,45 @@ export function getTravelTicks(map: GameMap, districtId: string): number {
   ));
   if (!edge) throw new Error(`Es gibt keine direkte Verbindung zum Gebiet ${districtId}.`);
   return edge.ticks;
+}
+
+const routes = new WeakMap<GameMap, Map<string, readonly RouteLeg[]>>();
+
+export function findRoute(map: GameMap, from: string, to: string): readonly RouteLeg[] {
+  if (from === to) return [];
+  let cache = routes.get(map);
+  if (!cache) {
+    cache = new Map();
+    routes.set(map, cache);
+  }
+  const key = JSON.stringify([from, to]);
+  const cached = cache.get(key);
+  if (cached) return cached;
+
+  const visited = new Set<string>();
+  const candidates = new Map<string, { distance: number; legs: readonly RouteLeg[] }>([[from, { distance: 0, legs: [] }]]);
+  while (candidates.size) {
+    const [nodeId, candidate] = [...candidates].sort(([a, x], [b, y]) => x.distance - y.distance || compareIds(a, b))[0];
+    if (nodeId === to) {
+      cache.set(key, candidate.legs);
+      return candidate.legs;
+    }
+    candidates.delete(nodeId);
+    visited.add(nodeId);
+    for (const edge of map.edges) {
+      const neighbor = edge.from === nodeId ? edge.to : edge.to === nodeId ? edge.from : null;
+      if (neighbor === null || visited.has(neighbor)) continue;
+      const distance = candidate.distance + edge.ticks;
+      if (distance < (candidates.get(neighbor)?.distance ?? Infinity)) {
+        candidates.set(neighbor, {
+          distance, legs: [...candidate.legs, { from: nodeId, to: neighbor, ticks: edge.ticks }],
+        });
+      }
+    }
+  }
+  throw new Error(`Es gibt keine Verbindung zwischen ${from} und ${to}.`);
+}
+
+export function compareIds(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
 }
