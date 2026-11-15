@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2025",
     "lib": [
-      "ES2022",
+      "ES2025",
       "DOM",
       "DOM.Iterable"
     ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
     "strict": true,
+    "noFallthroughCasesInSwitch": true,
     "noEmit": true,
     "types": [
       "node",
