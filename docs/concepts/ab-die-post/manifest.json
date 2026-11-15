@@ -1,0 +1,149 @@
+[
+  {
+    "file": "00-stilreferenz.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2994679,
+    "sha256": "cc815c8c2302df2d76ef3f3dd3665041d3ce9635e896a2f212bb355f9572c08a"
+  },
+  {
+    "file": "01-startmenue.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2920028,
+    "sha256": "9276cc0db26e9307c3fb76df4335fc7b4b3ffdc3ecab59376c311cc3ff046d60"
+  },
+  {
+    "file": "02-neue-partie.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2699828,
+    "sha256": "21b944cdb198ca726b16b7aa07b68dda01efc9da976ab62ac5e59f2000ad748d"
+  },
+  {
+    "file": "03-einstiegshilfe.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2671844,
+    "sha256": "567913b0116359495b8235326d6352f80f935540aac4314f75befb8374521123"
+  },
+  {
+    "file": "04-betrieb-karte.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2788717,
+    "sha256": "bc47693c019d8fe4030c49d913c90e26b05ce0e2bff3a3dc2dd09884a9645888"
+  },
+  {
+    "file": "05-betriebsuebersicht.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2521960,
+    "sha256": "248bdf4eeff9b3d4fb996bd826359d9419ecf096451bf51f8ee24cb6d94a0a69"
+  },
+  {
+    "file": "06-gebietsdetail.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2822290,
+    "sha256": "22225feadbfc60736871147a28ea62b9816d42c9f916fc4459d42cff5c8c3c27"
+  },
+  {
+    "file": "07-depots.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2388574,
+    "sha256": "75a4e21830892953bf3d6fd96ccd0cfa5995b95de57e0f951ade29419428ea29"
+  },
+  {
+    "file": "08-flotte.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2298742,
+    "sha256": "15d54c2d89eac0e3d28f8c66549e06912b5cf46bdcb68267f61b43d4e78984b6"
+  },
+  {
+    "file": "09-fahrzeugkauf.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2236293,
+    "sha256": "ac89c47bc55ce832ed76f7b44e634017831d2770a2da3ab962439bceba08234c"
+  },
+  {
+    "file": "10-fahrt-und-verlegung.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2645031,
+    "sha256": "424dbf0a0fbb4edd456cd59f3048580b8d66736fbad813fc52dcd60017527f63"
+  },
+  {
+    "file": "11-toureneditor.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2520745,
+    "sha256": "dfb1391a1262225f44fac0321066bf7f08c69403c30627af5ec9bf83cfcaccd7"
+  },
+  {
+    "file": "12-probleme.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2606525,
+    "sha256": "39c90b9f0fab0b74dc45896d0a181b5ac4f074e4aee4b1d35ce08f396261ba06"
+  },
+  {
+    "file": "13-ausbau.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2868538,
+    "sha256": "c1bcd7f7f17e45f022e8b35140019c1a0914f15773b9216f36aaef4e9ca49e27"
+  },
+  {
+    "file": "14-sanierung.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2210478,
+    "sha256": "fdd238aeb5ae2ac10438561232b8ee3d5d355bde4cf7fcef6e31148ba1573b7f"
+  },
+  {
+    "file": "15-spielstaende.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2651776,
+    "sha256": "587eda4cb5706b0f6c9d12d6dc0d60a2d1af5635c8302c77d8d3a8dfc7a891f9"
+  },
+  {
+    "file": "16-import.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2650936,
+    "sha256": "68bfab5e58a2023a251c777d8f543536d447d251ec0f8ec0eae7c75b65448436"
+  },
+  {
+    "file": "17-bestaetigungen.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2678396,
+    "sha256": "cacfd5a4f532c00fada72d28a4a9e1a4e7843e78976a381036434b0054fd6ed6"
+  },
+  {
+    "file": "18-fehler-und-status.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2558955,
+    "sha256": "44b07de6bd26fbcf991adf5639478c027a91e84505d26d1287ea175959861c14"
+  },
+  {
+    "file": "19-krise-und-wiederanlauf.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2902227,
+    "sha256": "a1f5813397ecc8586c53e6bbd569ab6a9f0bc87bbd7a263a79cced56030e45bb"
+  },
+  {
+    "file": "20-acht-gebiete.png",
+    "width": 1672,
+    "height": 941,
+    "bytes": 2822216,
+    "sha256": "1c3e69dd4769b3c14a3db02da19c6010e54b6ce0984ccc1a31288993ee84c463"
+  }
+]

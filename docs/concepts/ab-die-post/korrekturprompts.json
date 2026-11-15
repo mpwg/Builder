@@ -1,0 +1,22 @@
+[
+  {
+    "id": "03-einstiegshilfe",
+    "prompt": "Edit this tutorial screenshot, preserving its art style, logo, tutorial coachmark and controls. Correct the new-game map to EXACTLY FOUR districts named Nordpark, Westend, Altstadt, Hafen, each appearing once. Remove Südstadt and Ostviertel and both secondary depots; retain only Postzentrum as hub. Keep the coachmark '1 / 3 · Hier kommt die Post an', Briefe 24, Werbung 60, Weiter, Hilfe ausblenden and pause hint. Replace every 'xx % geliefert' label by concise open-mail counts. Remove the current problem sidebar entirely and use that space for the fourth district Hafen. This is the first run, with suitable start fleet and no missing-Lkw crisis. No fifth/sixth district. Keep routes clear and the warm paper style unchanged."
+  },
+  {
+    "id": "07-depots",
+    "prompt": "Make ONLY these precise corrections, keep all other layout, artwork and text unchanged. In the waiting shipments table change 'Speditionsware — Express' to 'Speditionsware — Standard'. Freight MUST NEVER have Express. Change heading 'Lager (Sendungen)' to 'Lager (LE)' because capacity is load units. Bottom navigation: only Depots should be yellow selected; Gebiete should be cream unselected. Preserve 60 belegt + 20 reserviert / 120."
+  },
+  {
+    "id": "08-flotte",
+    "prompt": "Make ONLY this precise correction to the Lkw 04 row of the fleet table, preserve everything else. It is in Überführung, so it must carry NO CARGO. Replace the Werbung and Speditionsware cargo icons/text in that row with 'Ohne Ladung', and change '26 / 60 LE' to '0 / 60 LE'. Do not change the selected Lieferwagen 03 row or right detail panel. Keep artwork/style/layout otherwise identical."
+  },
+  {
+    "id": "09-fahrzeugkauf",
+    "prompt": "Make ONLY these precise label corrections to the vehicle purchase screenshot. Capacity is abstract load units, not shipment count. In the four vehicle cards replace '20 Sendungen' with '20 LE', '60 Sendungen' with '60 LE', '120 Sendungen' with '120 LE', '400 Sendungen' with '400 LE'. Preserve prices, eligibility, vehicle illustrations, buttons and everything else unchanged."
+  },
+  {
+    "id": "14-sanierung",
+    "prompt": "Make ONLY this precise consistency correction in the top HUD of the recovery screenshot: replace the header Budget 12.480 € by Budget −1.200 €, matching the recovery dialog. Keep all other text, values, artwork and dialog exactly unchanged. The deficit must be the same in header and dialog."
+  }
+]

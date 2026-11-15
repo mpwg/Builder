@@ -1,0 +1,108 @@
+{
+  "date": "2026-11-15",
+  "tool": "image_gen.imagegen (integriertes Werkzeug)",
+  "reference": "00-stilreferenz.png",
+  "basePrompt": "Use case: ui-mockup. Generate ONE landscape 16:9 high-fidelity concept screenshot for German desktop postal strategy game \"Ab die Post\". The supplied image is the approved STYLE REFERENCE, not a screen to duplicate. Exactly preserve this art direction: warm ivory textured paper, subtle print grain, muted sage and sand geographic districts, golden postal-yellow buttons and postal pictograms, dark ink text, terracotta warnings, clear cobalt and teal routes with white edging, selected orange route, round route nodes, flat 2D map with blue river and bridges, small illustrated trees and roof silhouettes. Friendly bold slightly italic serif game logo \"Ab die Post\", readable humanist sans-serif UI. Consistent restrained rounded cream cards with fine ink outlines. No neon, no glass, no isometric/3D, no browser/device frame, no corporate dashboard styling. All user-facing text German with correct umlauts, very legible, limited and concise. Generous whitespace; functional game screenshot, not a marketing poster. Desktop composition. Shared in-game shell when relevant: compact top \"Ab die Post\" logo, \"Budget 12.480 €\", \"Pünktlichkeit 94 %\", \"Zufriedenheit 87 %\", pause and \"1× 2× 4×\", menu button; bottom navigation \"Betrieb\", \"Gebiete\", \"Depots\", \"Flotte\", \"Touren\", \"Ausbau\". Never show the old name Symbol-Logistik. This simulation delivers incoming mail to whole districts, no collection or returns, no individual houses as stops, no road construction. Shipment types: Werbung, Briefe, Einschreiben, Kleine Pakete, Speditionsware. Service class Standard or Express is separate from type. Vehicles: Fahrrad (no parcels or freight), Lastenrad (no freight), Lieferwagen (no freight), Lkw (all types). Numerical data are illustrative but internally consistent.",
+  "screens": [
+    {
+      "id": "01-startmenue",
+      "title": "Startmenü",
+      "prompt": "MAIN MENU without in-game HUD. Large beautiful \"Ab die Post\" postal logo at upper left and short subtitle \"Dein Netz. Deine Touren. Deine Post.\" Elegant cream menu card left: dominant yellow \"Fortsetzen\" with small saved game line \"Nordring · 6 Gebiete\"; \"Neue Partie\"; \"Spielstand importieren\". Right two-thirds is beautiful decorative postal route map with envelope hub, bike, cargo bike, van and truck, same approved style. Modest footer \"Spielstände werden lokal gespeichert\". Small inset bottom-left shows alternate EMPTY SAVE state: \"Noch keine Partie gespeichert\", disabled Fortsetzen, active Neue Partie and Importieren. No accounts or online features."
+    },
+    {
+      "id": "02-neue-partie",
+      "title": "Neue Partie",
+      "prompt": "NEW GAME SETUP. Center-left large cream form card titled \"Neue Partie\", labeled editable text input \"Seed\" value \"Nordring\", small dice button \"Zufällig\", explanation \"Gleicher Seed, gleiche Ausgangslage\". Preview map on right with EXACTLY four districts Altstadt, Nordpark, Westend, Hafen around Postzentrum, connected roads, no required secondary depot. Start summary \"4 Zustellgebiete\", \"Alle Sendungsarten verfügbar\", \"Geeignete Startflotte\". Footer buttons \"Zurück\" and yellow \"Starten\". No difficulty settings, unlock cards, accounts or extra gameplay systems."
+    },
+    {
+      "id": "03-einstiegshilfe",
+      "title": "Einstiegshilfe",
+      "prompt": "FIRST-RUN TUTORIAL over active four-district map. Keep game shell, exactly four districts. Warm paper coachmark pointing to postal center: \"1 / 3 · Hier kommt die Post an\", \"Briefe und Werbung warten auf die nächste Tour.\" Two real data chips \"Briefe 24\" and \"Werbung 60\". Highlight one bike on cobalt route with small label \"Fährt nach Altstadt\". Coachmark buttons \"Weiter\" and \"Hilfe ausblenden\". Small hint near pause \"In Ruhe planen: Pause\". Don't occlude the highlighted hub or bike. Remaining map remains visible and attractive."
+    },
+    {
+      "id": "04-betrieb-karte",
+      "title": "Karte und Pause",
+      "prompt": "MAIN GAME MAP in manually PAUSED planning state. Six large districts Nordpark, Westend, Altstadt, Ostviertel, Südstadt, Hafen and two depots. Show friendly approved detailed map, clean separated routes and vehicle pictograms. Top explicit status \"Pausiert · Manuell\" with yellow \"Fortsetzen\", speed controls. Left slim accessible district list \"Gebiete\" with names and open counts. Right narrow selected district Hafen card with \"28 Sendungen offen\", \"4 überfällig\", action \"Gebiet öffnen\". Map zoom + and −. Routes and selected vehicle remain visible while paused. Small bottom inline message \"Auswählen und Planen ist weiterhin möglich\". No numeric percent 'delivered' in a continuous game."
+    },
+    {
+      "id": "05-betriebsuebersicht",
+      "title": "Betriebsübersicht",
+      "prompt": "OPERATIONS ANALYSIS screen, titled \"Betriebsübersicht\". Game shell. Main cream ledger/dashboard with hand-printed chart aesthetic, small map inset. Four clear headline cards \"Offen 148\", \"Überfällig 12\", \"Pünktlichkeit 94 %\", \"Zufriedenheit 87 %\". Large accounting section \"Letzte 5 Simulationsminuten\": \"Erlöse 1.840 €\", \"Betriebskosten 1.220 €\", \"Operativer Saldo +620 €\"; separate lower section \"Investitionen 2.400 €\" and \"Sanierungszuschüsse 0 €\" visually excluded from operating result. Simple labeled trend line. Side panel district satisfaction with five/six rows and explanation \"Zustellungen und überfälliger Rückstand zählen\". Link button \"Probleme ansehen\". Friendly paper ledger, not financial trading terminal."
+    },
+    {
+      "id": "06-gebietsdetail",
+      "title": "Gebiet und Zuständigkeit",
+      "prompt": "DISTRICT DETAIL / EDIT view. Map left half with selected Hafen in terracotta boundary and orange route. Right wide cream panel \"Hafen\". Stats \"28 offen\", \"4 überfällig\", \"Zufriedenheit 78 %\". Table with headers \"Art\", \"Offen\", \"Überfällig\": Werbung 6/0, Briefe 10/1, Einschreiben 4/1, Kleine Pakete 5/1, Speditionsware 3/1. Service-class chips Standard and Express shown separately, not attached to every registered letter. Below table dropdown \"Zuständiges Depot\" value \"Depot Ost\"; priority dropdown \"Vorrang\" value \"Hoch\"; labeled numeric field \"Max. Bündelwartezeit\" value \"30 s\". Notice \"Gilt für neue Touren. Laufende Fahrten enden regulär.\" Buttons \"Abbrechen\", \"Änderungen übernehmen\"."
+    },
+    {
+      "id": "07-depots",
+      "title": "Depots und Umschlag",
+      "prompt": "DEPOT MANAGEMENT detail screen with game shell, small left list Postzentrum, Depot West, selected Depot Ost, freier Standort. Main title \"Depot Ost\". Center illustrated symbolic depot with inbound truck route and outbound cargo bike/van routes toward two districts, not photoreal warehouse. Lager stacked capacity bar labeled \"60 belegt + 20 reserviert / 120\"; distinguish free and reserved with hatch marks. Loading bays \"1 von 2 belegt\", waiting shipment mini table. Lower cards \"Zuständige Gebiete: Hafen, Ostviertel\", \"Flotte: 1 Lastenrad · 2 Lieferwagen\", action \"Fahrzeug zuweisen\". Clear buttons \"Standort eröffnen\" and secondary \"Depot räumen\". Show central hub entry backlog as small separate note \"Postzentrum: 148 offen · unbegrenzter Eingang\"."
+    },
+    {
+      "id": "08-flotte",
+      "title": "Flottenverwaltung",
+      "prompt": "FLEET MANAGEMENT with game shell. Header \"Flotte\" and yellow \"Fahrzeug kaufen\". Four compact summary chips with illustrated bike, cargo bike, van, truck. Main clean readable fleet table, columns Fahrzeug / Heimatdepot / Zustand / Ladung; four rows: Fahrrad 01, Lastenrad 02, Lieferwagen 03, Lkw 04. Distinct text statuses \"Unterwegs\", \"Belädt\", \"Zustellung\", \"Überführung\". Select Lieferwagen 03. Right paper detail card large charming yellow van pictogram, \"Lieferwagen 03\", \"Depot Ost\", \"18 / 30 LE\", \"Kleine Pakete und Briefe\", \"Keine Speditionsware\". Actions \"Fahrt ansehen\", \"Verlegen\", \"Tourvorlage\". Small costs row \"Bereitstellung\" vs \"Fahrtkosten\", no maintenance/fuel/personnel interfaces."
+    },
+    {
+      "id": "09-fahrzeugkauf",
+      "title": "Fahrzeug kaufen",
+      "prompt": "VEHICLE PURCHASE dialog over dimmed parchment fleet view. Wide cream catalog headed \"Fahrzeug kaufen\". Four aligned cards with charming dark ink yellow vehicle illustrations and exact headings Fahrrad, Lastenrad, Lieferwagen, Lkw. Distinguish price, capacity and operating cost with short illustrative values. Eligibility text explicit: Fahrrad \"Werbung, Briefe, Einschreiben\"; Lastenrad \"Auch kleine Pakete\"; Lieferwagen \"Auch kleine Pakete\"; Lkw \"Alle Arten, auch Speditionsware\". Select Lkw with yellow outline. Bottom \"Zieldepot\" dropdown \"Depot Ost\", clear total \"Kaufpreis 4.800 €\", \"Budget danach 7.680 €\", buttons \"Abbrechen\" and \"Lkw kaufen\". Only Lkw supports freight. No game locks, no random unlocks."
+    },
+    {
+      "id": "10-fahrt-und-verlegung",
+      "title": "Fahrt und Überführung",
+      "prompt": "VEHICLE TRIP detail screen. Game shell and map left, selected yellow van on orange numbered route Postzentrum → Altstadt → Hafen → Postzentrum. Right panel \"Lieferwagen 03\", phase tracker \"Beladen — Fahren — Zustellen — Rückkehr\" with Fahren active. \"Ziel: Altstadt\", shipment list \"Briefe 12 · Express\", \"Kleine Pakete 6 · Standard\", load \"18 / 30 LE\". Below, open clearly separated relocation preview card \"Nach Depot West verlegen\", \"Überführung nach Rückkehr, ohne Ladung\", \"Fahrtkosten 18 €\", button \"Verlegung vormerken\". Small badge \"Neue Touren ab Depot West\". Avoid suggesting loaded vehicle teleportation. Map route and home depot return leg obvious."
+    },
+    {
+      "id": "11-toureneditor",
+      "title": "Toureneditor",
+      "prompt": "TOUR TEMPLATE EDITOR with game shell. Left half geographic map with clear numbered highlighted route 1 Altstadt, 2 Nordpark, 3 Westend, start and end at Postzentrum. Right cream editor \"Tourvorlage bearbeiten\", name field \"Nordrunde\", type selector \"Lastenrad\", assigned vehicle \"Lastenrad 02\". Ordered stop list with each row having visible up/down arrow buttons and remove ×, plus \"Gebiet hinzufügen\". \"Geschätzte Fahrzeit 4:20\", \"Max. Bündelwartezeit 30 s\". Note \"Verbindlich für zugewiesene Fahrzeuge\" and \"Laufende Tour bleibt unverändert\". Bottom primary \"Vorlage speichern\", secondary \"Automatik übernehmen lassen\". Small text status \"Vorschau gültig\". No freehand road construction or drag-only editing."
+    },
+    {
+      "id": "12-probleme",
+      "title": "Problemdiagnose",
+      "prompt": "PROBLEM DIAGNOSIS screen. Game shell, clear map on left with THREE numbered warning locations; right 55% a cream panel \"Probleme\" with three focused actionable stacked cards. Card1 Hafen: \"Kein Lkw für Speditionsware\", \"3 Sendungen warten\", action \"Flotte zuweisen\". Card2 Depot Ost: \"Ladeplätze ausgelastet\", \"2 Fahrzeuge warten\", action \"Depot ansehen\". Card3 Nordrunde: \"Vorlage bindet geeignete Fahrzeuge\", action \"Tourvorlage öffnen\". Severity uses icons and text, not only colors. Bottom quiet status \"Keine Sendung geht verloren\". Focus on concrete cause → affected location → action. Terracotta warnings warm, no aggressive catastrophic alarm. Add two compact secondary diagnostic rows \"Depot West: Lager voll\" and \"Gesamtkapazität zu gering\", each with a labeled action."
+    },
+    {
+      "id": "13-ausbau",
+      "title": "Ausbau und freier Betrieb",
+      "prompt": "EXPANSION SCREEN with game shell. Main title \"Dein Postnetz wächst\". Three milestone stamp cards across top \"1 · Vier Gebiete\", \"2 · Sechs Gebiete\", \"3 · Acht Gebiete\", first completed. Current requirement panel \"Bewertungsfenster: 5:00 / 5:00\", \"Pünktlichkeit 94 %\", \"Zufriedenheit 87 %\", \"Operativer Saldo +620 €\", green stamped \"Ziel erreicht\". Main map preview shows FOUR current districts plus TWO dashed ghosted preview districts Südstadt and Ostviertel, explicit legend \"Bestehend\" / \"Geplanter Ausbau\". Preview panel \"Zusätzliches Aufkommen\", \"Benötigte Kapazität\", \"Empfehlung: 1 Lieferwagen\". Buttons \"Später\" and \"Auf 6 Gebiete erweitern\". Bottom small separate example state card labeled \"Nach Ziel 3\" with \"Alle Ausbauziele erreicht\", \"Frei weiterspielen\". Never automatic expansion or random unlock rewards."
+    },
+    {
+      "id": "14-sanierung",
+      "title": "Sanierung",
+      "prompt": "RECOVERY PLAN screen/modal over softly muted map. Title \"Sanierung planen\", prominent \"Pausiert · Sanierung\". Top actual starting deficit \"Budget −1.200 €\". Readable three-step plan with icons: \"1 Fahrzeuge zurückholen\" \"4 Fahrzeuge · 38 Sendungen sichern\"; \"2 Flotte neu ordnen\" \"Lkw nach Depot Ost\"; \"3 Budget ausgleichen\". Recovery location \"Postzentrum\", \"Bergungsbestand: 38 Sendungen\" separate from regular storage. Finance table \"Fehlbetrag 1.200 €\", \"Zusätzliche Flotte 4.800 €\", \"Zuschuss 6.000 €\", \"Budget danach 0 €\". Notice \"Sendungsalter und Zufriedenheit bleiben erhalten\", \"Zuschuss zählt nicht als Erlös\", \"Neues Bewertungsfenster nach Sanierung\". Buttons \"Abbrechen\" and yellow \"Sanierung durchführen\". No bankruptcy game over, no reset of mail or free money counted as operating income."
+    },
+    {
+      "id": "15-spielstaende",
+      "title": "Spielstände",
+      "prompt": "SAVE GAME dialog screen on cream background over map. Title \"Spielstände\". Two separated sections \"Automatisch\" with one latest slot, \"Manuell\" with three named slots, at least one empty \"Freier Speicherplatz\". Populated card \"Nordring · 6 Gebiete\", \"Spielzeit 24:30\", \"Gespeichert 15.11.2026 · 14:32\", status \"Gespeichert\" with check. Selected manual slot has clear buttons \"Speichern\", \"Laden\", \"Exportieren\". Footer \"Spielstand importieren\", \"Zurück zum Spiel\". Informational footer \"Lokal im Browser gespeichert. Export schützt vor Datenverlust.\" No account/cloud sync or invented online functionality. Render local storage state distinctly and rows uncluttered."
+    },
+    {
+      "id": "16-import",
+      "title": "Import prüfen",
+      "prompt": "IMPORT VALIDATION dialog over game map. Title \"Spielstand importieren\". Selected file paper icon \"nordring.json\", \"Datei geprüft\" green stamp. Preview fields \"Seed: Nordring\", \"6 Gebiete\", \"Spielzeit 24:30\", \"4 aktive Fahrten\". Explain \"Die laufende Partie wird erst nach Bestätigung ersetzt.\" Three footer buttons \"Andere Datei wählen\", \"Abbrechen\", yellow \"Spielstand übernehmen\". Side small inset alternative INVALID state, clearly labeled \"Fehlerzustand\": red paper callout \"Spielstand nicht lesbar\", \"Dateiversion wird nicht unterstützt\", \"Die laufende Partie bleibt erhalten\", primary \"Andere Datei wählen\", no active import confirmation. Keep good contrast and text sharp."
+    },
+    {
+      "id": "17-bestaetigungen",
+      "title": "Bestätigungsdialoge",
+      "prompt": "Create a coherent UI concept sheet showing THREE LARGE DIALOG mockups, arranged with one large top dialog and two lower dialogs; all from the same approved game style over faint map fragments. Each has small Ab die Post branding. Top: \"Partie wechseln?\" with \"Vor dem Wechsel speichern?\" and THREE explicit buttons \"Speichern und wechseln\", \"Wechseln\", \"Abbrechen\". Bottom left: \"Depot eröffnen\", \"Standort: Westend\", \"Kosten: 1.200 €\", \"Budget danach: 11.280 €\", buttons \"Abbrechen\", \"Depot eröffnen\". Bottom right: \"Depot Ost räumen\", \"3 Fahrzeuge · 28 Sendungen\", \"Ziel: Postzentrum\", \"Laufende Touren enden regulär. Restbestände werden zurückgebracht.\", buttons \"Abbrechen\", \"Räumung starten\". Show small progress badge below \"Räumung läuft · 12 Sendungen verbleiben\". This is a deliberate multi-state concept sheet, not a single simultaneous screen. No destructive delete claims."
+    },
+    {
+      "id": "18-fehler-und-status",
+      "title": "Fehler-, Warte- und Pausenzustände",
+      "prompt": "Create one deliberate UI state concept sheet with SIX readable cream cards in a 3 by 2 grid on warm paper, header \"Ab die Post · Zustände und Rückmeldungen\". Use same approved typography, terracotta errors, yellow actions, teal success, generous readability. Card1 \"Speichern fehlgeschlagen\" / \"Letzter gültiger Stand bleibt erhalten\" / buttons \"Erneut versuchen\" and \"Exportieren\". Card2 \"Neuerer Spielstand vorhanden\" / \"Ein anderer Tab hat gespeichert\" / button \"Als Datei exportieren\". Card3 \"Tourvorlage ungültig\" / \"Hafen gehört zu einem anderen Depot\" / button \"Zuordnung prüfen\". Card4 \"Vorlage wartet\" / \"Kein geeignetes Fahrzeug verfügbar\" / buttons \"Flotte ansehen\" and \"Automatik übernehmen lassen\". Card5 \"Sanierung nicht übernommen\" / \"Die Vorschau ist nicht mehr aktuell\" / button \"Neu berechnen\"; small separate success strip \"Sanierung abgeschlossen · 38 Sendungen gesichert\". Card6 \"Pausiert\" with two distinct labeled examples \"Manuell pausiert\" and \"Tab war verborgen\"; helper \"Keine Zeit wird nachgeholt\"; button \"Fortsetzen\". Add tiny bottom note \"Eine manuelle Pause bleibt nach Dialogen bestehen\". No fake crash screen, readable concepts for error handling."
+    },
+    {
+      "id": "19-krise-und-wiederanlauf",
+      "title": "Krise und Wiederanlauf",
+      "prompt": "Create a deliberate TWO-PANEL concept comparison sheet of the same game map before and after recovery, in approved warm paper art style, each panel with clearly readable compact game HUD. Title \"Ab die Post · Sanierung und Wiederanlauf\". Left titled \"Krise\": Budget −1.200 €, Pünktlichkeit 61 %, Zufriedenheit 48 %, Hafen badge \"38 überfällig\", \"Kein geeigneter Lkw\", prominent button \"Sanierung planen\". Right titled \"Wiederanlauf\": Budget 0 €, SAME Pünktlichkeit 61 % and SAME Zufriedenheit 48 % (must not reset), Postzentrum card \"Bergungsbestand: 38 Sendungen\", Lkw now available, \"Zuschuss: 6.000 € · kein Erlös\", \"Bewertungsfenster: 0:00 / 5:00\", notice \"Sendungsalter bleibt erhalten\". Show button \"Betrieb fortsetzen\". Below right a small visible manual pause badge \"Manuelle Pause bleibt aktiv\". Clearly same geography, improved vehicle suitability, not magically completed deliveries or cleared backlog."
+    },
+    {
+      "id": "20-acht-gebiete",
+      "title": "Acht Gebiete und kompakte Ansicht",
+      "prompt": "Create a single landscape desktop screenshot designed with compact 1280 × 720 composition in the approved style. Late-game FREE PLAY map with EXACTLY EIGHT bounded districts: Altstadt, Nordpark, Westend, Hafen, Südstadt, Ostviertel, Waldhöhe, Gewerbepark. Map fills two-thirds, cream district list at right with all eight entries and open counts, small vehicle pictograms, clear blue/teal/orange routes, Postzentrum and two depots. Top concise \"Ab die Post\", Budget 12.480 €, Pünktlichkeit 94 %, Zufriedenheit 87 %, pause 1× 2× 4×. Celebratory but understated postage-stamp banner \"Alle 3 Ausbauziele erreicht · Freier Betrieb\". Bottom concise navigation. Visible keyboard focus double outline around selected \"Hafen\" row, map zoom buttons, text and warning symbols alongside color. Keep map readable at small desktop size, no confetti overlay, no ninth district, no mobile mockup."
+    }
+  ]
+}
