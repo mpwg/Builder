@@ -101,6 +101,12 @@ export function planLoad(
   });
 
   if (!candidates.length) {
+    if (home.closing) {
+      const incoming = state.vehicles.some((item) =>
+        'cargo' in item && item.plan.kind === 'transfer' && item.plan.destinationId === homeId &&
+        item.cargo.some(({ kind }) => eligible.includes(kind)));
+      return incoming ? 'Wartet auf eintreffende Sendungen zur Räumung.' : null;
+    }
     if (invalidTemplate) return 'Vorlage wartet: Gebietszuordnung oder Heimatdepot hat sich geändert.';
     return template !== null ? 'Vorlage wartet: Keine passenden Sendungen für ihre Halte verfügbar.' : null;
   }

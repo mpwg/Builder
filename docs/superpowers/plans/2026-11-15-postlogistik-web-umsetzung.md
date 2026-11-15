@@ -47,6 +47,8 @@ Abnahme: Typprüfung, acht Core- und Taktgeber-Tests sowie drei Playwright-Tests
 
 Abnahme: Typprüfung, Produktionsbuild und 24 Core- und Taktgeber-Tests bestanden. Die Core-Fälle prüfen zusätzlich Bündelkonflikte, Expressfrist, Doppelbuchungen, den Rücktransport aus einem Depot und die Räumung bei verbindlicher Vorlage. Vier Playwright-Tests in Chromium 159 unter `/post/` bestanden. Mit dem Seed `Nordring` wurden alle fünf Sendungsarten, Depotbestand nach Umschlag, Fahrzeugverlegung, eine gestartete manuelle Tour, Rückgabe an die Automatik und abgeschlossene Räumung nachvollzogen. Die README erklärt den Einstieg in Depotbetrieb und Tourplanung.
 
+Nachprüfung: Typprüfung, Produktionsbuild, 26 Core- und Taktgeber-Tests sowie elf Playwright-Tests in Chromium 159 unter `/post/` bestanden. Zwei neue Core-Tests sichern, dass ein geeigneter Lkw gelagerte und bereits beladen anfahrende Fracht aus seinem räumenden Heimatdepot abtransportiert, bevor seine vorgemerkte Verlegung beginnt. Ein neuer Browsertest prüft, dass Gebietsauswahl und Fahrzeitvorschau einer Tourvorlage bereits vor Abfahrt zum künftigen Depot passen. Im Browser wurde mit `Nordring` zusätzlich eine solche Vorlage gespeichert und wieder an die Automatik übergeben. Die README beschreibt beide Abläufe.
+
 ## Meilenstein 3 · Betriebsergebnis, Ausbau und Sanierung
 
 - [ ] `src/core/metrics.ts` wertet Zustellungen, überfälligen Rückstand und operativen Saldo für ein Fenster von 3.000 Ticks aus. Express erhält größeres Gewicht. Ein leeres Zustellfenster erfüllt kein Ziel. `overdueBacklogLowersSatisfaction` prüft den Einfluss offener Fristüberschreitungen. `mixedFleetReducesCostAtEqualService` vergleicht zwei Flotten bei identischem Aufkommen.

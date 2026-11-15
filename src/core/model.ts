@@ -134,6 +134,7 @@ export interface VehicleView {
   readonly id: string;
   readonly type: VehicleType;
   readonly homeId: string;
+  readonly templateDepotId: string;
   readonly x: number;
   readonly y: number;
   readonly phase: VehiclePhase;

@@ -8,7 +8,9 @@ Meilenstein 2 ist spielbar. Fahrrad, Lastenrad, Lieferwagen und Lkw verteilen al
 
 Für den ersten Depotumschlag unter **Depots** einen Standort eröffnen. Unter **Gebiete** das gewünschte Gebiet auswählen und dem neuen Depot zuordnen. Anschließend unter **Flotte** ein passendes Fahrzeug zum Depot verlegen oder dort kaufen. Sendungen kommen per Transfer aus dem Postzentrum. Für Speditionsware braucht auch das zustellende Depot einen Lkw.
 
-Unter **Touren** lassen sich Halte für das unter **Flotte** ausgewählte Fahrzeug hinzufügen, umsortieren und als verbindliche Tourvorlage speichern. **Automatik übernehmen lassen** gibt das Fahrzeug für die automatische Planung frei. Eine laufende Tour behält ihre Halte.
+Mit **Depot räumen** gehen die Gebiete ans Postzentrum zurück. Fahrzeuge am räumenden Depot bringen passende Restbestände und bereits anfahrende Ladung zuerst zurück, bevor ihre vorgemerkte Verlegung beginnt.
+
+Unter **Touren** lassen sich Halte für das unter **Flotte** ausgewählte Fahrzeug hinzufügen, umsortieren und als verbindliche Tourvorlage speichern. Nach einer beauftragten Verlegung kannst du die Vorlage schon für das neue Depot planen. **Automatik übernehmen lassen** gibt das Fahrzeug für die automatische Planung frei. Eine laufende Tour behält ihre Halte.
 
 ## Lokal spielen
 
@@ -41,7 +43,7 @@ bunx --bun playwright install chromium
 bun run test:e2e
 ```
 
-Die Core-Tests prüfen unter anderem 128 Karten-Seeds, Zustellung und Erlösbuchung. Playwright testet den Produktionsbuild unter `/post/` in Chromium. Dazu gehören zwei vollständige Briefzustellungen und das Pausenverhalten mit kontrollierten Sichtbarkeitsereignissen.
+Die Core-Tests prüfen unter anderem 128 Karten-Seeds, Reservierungen beim Depotumschlag sowie Zustellung und Erlösbuchung. Playwright testet den Produktionsbuild unter `/post/` in Chromium. Dazu gehören die Zustellung aller fünf Sendungsarten, Depotumschlag und Tourvorlagen, zwei vollständige Briefzustellungen und das Pausenverhalten mit kontrollierten Sichtbarkeitsereignissen.
 
 - [Spielentwurf](docs/superpowers/specs/2026-11-15-postlogistik-design.md)
 - [Visuelle Konzepte für „Ab die Post“](docs/concepts/ab-die-post/README.md) · [Bildgalerie](docs/concepts/ab-die-post/galerie.md)

@@ -61,13 +61,15 @@ function dispatchVehicle(state: GameState, vehicle: VehicleState): GameState {
 
   switch (phase) {
     case 'idle': {
-      if (vehicle.pendingHomeId && vehicle.pendingHomeId !== homeId) {
-        const travel = beginTravel(map, homeId, vehicle.pendingHomeId, vehicle.type, tick);
+      const relocationTarget = vehicle.pendingHomeId === homeId ? null : vehicle.pendingHomeId;
+      const evacuating = state.depots.some((depot) => depot.id === homeId && depot.closing);
+      const plan = !relocationTarget || evacuating ? planLoad(state, vehicle, canUseBay) : null;
+      if (relocationTarget && plan === null) {
+        const travel = beginTravel(map, homeId, relocationTarget, vehicle.type, tick);
         return replace(chargeOperation(state, travelCost(vehicle, travel.endsAt - tick)), {
           ...metadata, phase: 'relocating', travel,
-        }, `${VEHICLES[vehicle.type].name} wird nach ${getMapNode(map, vehicle.pendingHomeId).name} überführt.`);
+        }, `${VEHICLES[vehicle.type].name} wird nach ${getMapNode(map, relocationTarget).name} überführt.`);
       }
-      const plan = planLoad(state, vehicle, canUseBay);
       if (!plan || typeof plan === 'string') {
         return vehicle.waitReason === plan ? state : replace(state, { ...metadata, phase: 'idle', waitReason: plan });
       }

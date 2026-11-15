@@ -342,6 +342,45 @@ test('explicit depot closure can retrieve freight even if the only truck has a t
   expect(delivered(state, 'district-1')).toMatchObject([{ kind: 'freight', quantity: 1 }]);
 });
 
+test('a depot evacuates its freight before its only truck relocates', () => {
+  let state = act(fixture(), { type: 'open-depot', depotId: 'depot-1' });
+  state = act(state, { type: 'open-depot', depotId: 'depot-2' });
+  state = act(state, { type: 'assign-district', districtId: 'district-1', depotId: 'depot-1' });
+  const truck = state.vehicles.find(({ type }) => type === 'truck')!;
+  state = act(state, { type: 'relocate-vehicle', vehicleId: truck.id, depotId: 'depot-1' });
+  state = run(state, 80);
+  state = { ...state, waiting: [batch('depot-1', 'district-1', 1, 'freight', 490)] };
+  state = act(state, { type: 'relocate-vehicle', vehicleId: truck.id, depotId: 'depot-2' });
+  state = act(state, { type: 'close-depot', depotId: 'depot-1' });
+
+  state = run(state, 300);
+  const view = readView(state);
+  expect(view.depots.find(({ id }) => id === 'depot-1')).toMatchObject({ open: false, closing: false, used: 0, reserved: 0 });
+  expect(state.waiting).toEqual([batch('center', 'district-1', 1, 'freight', 490)]);
+  expect(view.vehicles.find(({ id }) => id === truck.id)).toMatchObject({ homeId: 'depot-2', phase: 'idle' });
+});
+
+test('a truck waits to evacuate freight already on its way to a closing depot', () => {
+  let state = act(fixture(), { type: 'open-depot', depotId: 'depot-1' });
+  state = act(state, { type: 'open-depot', depotId: 'depot-2' });
+  state = act(state, { type: 'assign-district', districtId: 'district-1', depotId: 'depot-1' });
+  state = act(state, { type: 'buy-vehicle', vehicleType: 'truck', depotId: 'depot-1' });
+  const [centerTruck, localTruck] = state.vehicles.filter(({ type }) => type === 'truck');
+  state = run({ ...state, waiting: [batch('center', 'district-1', 1, 'freight', 490)] }, 20);
+  expect(readView(state).vehicles.find(({ id }) => id === centerTruck.id)).toMatchObject({
+    phase: 'transfer', targetId: 'depot-1', cargo: 1,
+  });
+  state = act(state, { type: 'relocate-vehicle', vehicleId: centerTruck.id, depotId: 'depot-2' });
+  state = act(state, { type: 'relocate-vehicle', vehicleId: localTruck.id, depotId: 'depot-2' });
+  state = act(state, { type: 'close-depot', depotId: 'depot-1' });
+
+  state = run(state, 300);
+  const view = readView(state);
+  expect(view.depots.find(({ id }) => id === 'depot-1')).toMatchObject({ open: false, closing: false, used: 0, reserved: 0 });
+  expect(state.waiting).toEqual([batch('center', 'district-1', 1, 'freight', 490)]);
+  expect(view.vehicles.filter(({ type }) => type === 'truck').map(({ homeId }) => homeId)).toEqual(['depot-2', 'depot-2']);
+});
+
 test('closing a second depot does not cancel the evacuation of a vehicle from the first', () => {
   let state = act(fixture(), { type: 'open-depot', depotId: 'depot-1' });
   state = act(state, { type: 'open-depot', depotId: 'depot-2' });

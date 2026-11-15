@@ -114,7 +114,7 @@ export function createWorkbench(
   function renderDraft() {
     const vehicle = currentVehicle();
     const route = editor.read();
-    const from = vehicle?.homeId;
+    const from = vehicle?.templateDepotId;
     if (!vehicle || !from || !route.length) {
       setText(byId('tour-estimate'), 'Füge ein oder mehrere Gebiete zur Vorlage hinzu.');
       return;
@@ -203,7 +203,7 @@ export function createWorkbench(
     setText(byId('tour-wait'), vehicle.waitReason ?? '');
     release.disabled = vehicle.template === null;
 
-    const options = view.districts.filter(area => area.depotId === vehicle.homeId).map(area => ({ id: area.id, name: name(area.id) }));
+    const options = view.districts.filter(area => area.depotId === vehicle.templateDepotId).map(area => ({ id: area.id, name: name(area.id) }));
     for (const id of vehicle.template ?? []) {
       if (!options.some(option => option.id === id)) options.push({ id, name: name(id) });
     }

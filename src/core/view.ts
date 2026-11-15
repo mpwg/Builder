@@ -21,7 +21,7 @@ function readVehicle(state: GameState, vehicle: VehicleState): VehicleView {
     : pendingHomeId && phase !== 'relocating' ? `Überführung nach ${getMapNode(map, pendingHomeId).name} nach Rückkehr.`
     : null;
   return {
-    id, type, homeId, x, y, phase, targetId, template, stops, waitReason,
+    id, type, homeId, templateDepotId: pendingHomeId ?? homeId, x, y, phase, targetId, template, stops, waitReason,
     cargo: 'cargo' in vehicle ? vehicle.cargo.reduce((total, shipment) => total + shipment.quantity, 0) : 0,
   };
 }
