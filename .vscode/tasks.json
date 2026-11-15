@@ -1,0 +1,73 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}"
+  },
+  "tasks": [
+    {
+      "label": "Abhängigkeiten installieren",
+      "type": "process",
+      "command": "bun",
+      "args": ["install", "--frozen-lockfile"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Spiel starten",
+      "type": "process",
+      "command": "bun",
+      "args": ["run", "dev", "--host", "127.0.0.1", "--open"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Spiel bauen",
+      "type": "process",
+      "command": "bun",
+      "args": ["run", "build"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Typen prüfen",
+      "type": "process",
+      "command": "bun",
+      "args": ["run", "check", "--pretty", "false"],
+      "problemMatcher": "$tsc"
+    },
+    {
+      "label": "Core- und Taktgeber-Tests",
+      "type": "process",
+      "command": "bun",
+      "args": ["run", "test"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Chromium für Browsertests installieren",
+      "type": "process",
+      "command": "bunx",
+      "args": ["--bun", "playwright", "install", "chromium"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Browsertests ausführen",
+      "type": "process",
+      "command": "bun",
+      "args": ["run", "test:e2e"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Projekt prüfen",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Typen prüfen", "Core- und Taktgeber-Tests", "Browsertests ausführen"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

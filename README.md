@@ -19,6 +19,15 @@ Die ausgegebene Adresse im Browser öffnen und **Neue Partie → Starten** wähl
 
 `bun run build` erzeugt `dist/` zur statischen Auslieferung. Der Build funktioniert auch unter einem URL-Unterpfad. Die Simulation läuft vollständig im Browser.
 
+## VS Code
+
+Die Tasks stehen unter **Terminal → Task ausführen**. Bun muss für VS Code im `PATH` verfügbar sein.
+
+- **Abhängigkeiten installieren** richtet das Projekt anhand der Sperrdatei ein.
+- **Spiel starten** startet Vite lokal und öffnet das Spiel im Browser. Zum Beenden den Task stoppen.
+- **Spiel bauen** erzeugt den statischen Build. Das ist der Standard-Buildtask mit ⇧⌘B auf macOS.
+- **Projekt prüfen** führt Typprüfung, Core- und Taktgeber-Tests sowie die Browsertests mit Produktionsbuild aus. Vor dem ersten Browsertest **Chromium für Browsertests installieren** ausführen.
+
 ## Prüfen
 
 ```sh
