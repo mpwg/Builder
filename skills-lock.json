@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "skills": {
+    "game-balance-analysis": {
+      "source": "Yuki001/game-dev-skills",
+      "sourceType": "github",
+      "skillPath": "skills/game-balance-analysis/SKILL.md",
+      "computedHash": "b4940a8911c95b01bc93601d2ddff2a6eeeb6642a628554b8b5e9c40add24acf"
+    },
+    "game-playtest": {
+      "source": "openai/plugins",
+      "sourceType": "github",
+      "skillPath": "plugins/game-studio/skills/game-playtest/SKILL.md",
+      "computedHash": "8a026ade1edc0b1e06a74005b83d4785eb2898547dbe6f866eaf5f7c31e4616a"
+    },
+    "game-systems-design": {
+      "source": "pbzona/godot-skills",
+      "sourceType": "github",
+      "skillPath": "skills/game-systems-design/SKILL.md",
+      "computedHash": "d2b27ef63782cf50d6a0e233b5f9ab7f23b81e9d430ac52ca20d89c2778f4869"
+    },
+    "playwright-best-practices": {
+      "source": "currents-dev/playwright-best-practices-skill",
+      "sourceType": "github",
+      "skillPath": "playwright-best-practices/SKILL.md",
+      "computedHash": "111e9d3e9d63dea34814120fb6583c0b28ee45371662801d8e8d8bdf4b05dcb0"
+    }
+  }
+}
